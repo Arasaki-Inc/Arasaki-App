@@ -1,3 +1,5 @@
+using System.IO.Compression;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Identity.Web;
@@ -13,6 +15,7 @@ builder.Services.AddResponseCompression(options =>
     options.Providers.Add<BrotliCompressionProvider>();
     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "image/svg+xml" });
 });
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.SmallestSize);
 
 WebApplication app = builder.Build();
 Services.SetServiceProvider(app.Services.CreateScope().ServiceProvider);
