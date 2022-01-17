@@ -28,10 +28,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot-dev\**" />
+    <Content Remove="wwwroot-dev\**" />
+    <EmbeddedResource Remove="wwwroot-dev\**" />
+    <None Remove="wwwroot-dev\**" />
+    <TypeScriptCompile Remove="wwwroot-dev\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Authentication.WebAssembly.Msal" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.5.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

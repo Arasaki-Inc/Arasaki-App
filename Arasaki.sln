@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32104.313
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arasaki.Server", "Arasaki\Server\Arasaki.Server.csproj", "{C242FDB4-5D47-4FD4-B244-263CFB7DE658}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.Server", "Arasaki\Server\Arasaki.Server.csproj", "{C242FDB4-5D47-4FD4-B244-263CFB7DE658}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arasaki.Client", "Arasaki\Client\Arasaki.Client.csproj", "{5C474F34-4BEB-4DFE-93D3-527FC305ADDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.Client", "Arasaki\Client\Arasaki.Client.csproj", "{5C474F34-4BEB-4DFE-93D3-527FC305ADDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arasaki.Shared", "Arasaki\Shared\Arasaki.Shared.csproj", "{8B04EE73-495C-48ED-9076-6ACA9F33F77D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.Shared", "Arasaki\Shared\Arasaki.Shared.csproj", "{8B04EE73-495C-48ED-9076-6ACA9F33F77D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
