@@ -15,9 +15,12 @@ builder.Services.AddResponseCompression(options =>
 });
 
 WebApplication app = builder.Build();
+Services.SetServiceProvider(app.Services.CreateScope().ServiceProvider);
+References.IsDevelopmentMode = app.Environment.IsDevelopment();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseWebAssemblyDebugging();
 }
 else
@@ -35,4 +38,5 @@ app.UseResponseCompression();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
-await app.RunAsync("https://0.0.0.0:7107");
+if (References.IsDevelopmentMode) await app.RunAsync("https://0.0.0.0:7107");
+else await app.RunAsync();
