@@ -362,8 +362,11 @@ async function processing()
 
     loadConfig()
     await processing()
-    chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true }).on('change', async () =>
+    if (isDebug)
     {
-        await processing()
-    });
+        chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true }).on('change', async () =>
+        {
+            await processing()
+        });
+    }
 })()
