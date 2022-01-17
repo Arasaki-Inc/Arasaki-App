@@ -2,7 +2,7 @@ name: Microsoft Azure Publication
 on:
   push:
     branches:
-    - master
+    - main
 env:
   AZURE_WEBAPP_NAME: Arasaki-App-Server
   AZURE_WEBAPP_PACKAGE_PATH: Arasaki/Server/publish
@@ -16,12 +16,14 @@ jobs:
     steps:
     - uses: actions/setup-node@v2
     - uses: actions/checkout@v2
-    - name: Setup .NET Core
+    - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
     - name: Install Dotnet WASM Tools
       run: dotnet workload install wasm-tools
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
     - name: Restore Dependencies
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
     - name: Run Arasaki Bundler
