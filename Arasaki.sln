@@ -27,6 +27,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bundler", "Bundler", "{CC6B
 		Bundler\package.json = Bundler\package.json
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Actions", "Actions", "{96A7B529-E996-4D7A-BFBD-F9639447955D}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\Arasaki-App-Server.yml = .github\workflows\Arasaki-App-Server.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +53,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{96A7B529-E996-4D7A-BFBD-F9639447955D} = {AE1165D5-9EC2-43B3-BC1E-F21EEEAA7553}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C935696C-4354-492A-BC53-D156A2AA0100}
