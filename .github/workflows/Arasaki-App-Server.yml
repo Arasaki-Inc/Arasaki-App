@@ -23,6 +23,9 @@ jobs:
       run: dotnet workload install wasm-tools
     - name: Restore Dependencies
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
+    - name: Optimise Arasaki Assets
+      run: |
+        cmd /c Bundler/bundle_release.cmd"
     - name: Build App
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Test App
