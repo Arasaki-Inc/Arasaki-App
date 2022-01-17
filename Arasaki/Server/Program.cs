@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Identity.Web;
-using Azure.Identity;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-Uri keyVaultEndpoint = new(Environment.GetEnvironmentVariable("VaultUri"));
-builder.Configuration.AddAzureKeyVault(keyVaultEndpoint, new DefaultAzureCredential());
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
