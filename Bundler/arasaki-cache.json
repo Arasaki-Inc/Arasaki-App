@@ -5,18 +5,6 @@
 			"lastModified": "2022-01-17T21:33:39.715Z"
 		},
 		{
-			"relativeFilePath": "\\manifest.json",
-			"lastModified": "2022-01-17T21:41:43.009Z"
-		},
-		{
-			"relativeFilePath": "\\pwa-192.png",
-			"lastModified": "2022-01-17T21:33:55.480Z"
-		},
-		{
-			"relativeFilePath": "\\pwa-512.png",
-			"lastModified": "2022-01-17T21:34:01.801Z"
-		},
-		{
 			"relativeFilePath": "\\webfonts\\Montserrat-Black.woff2",
 			"lastModified": "2021-12-24T18:05:53.000Z"
 		},
@@ -87,6 +75,30 @@
 		{
 			"relativeFilePath": "\\webfonts\\Montserrat-ThinItalic.woff2",
 			"lastModified": "2021-12-24T18:05:52.000Z"
+		},
+		{
+			"relativeFilePath": "\\service-worker.js",
+			"lastModified": "2022-01-17T21:42:03.139Z"
+		},
+		{
+			"relativeFilePath": "\\service-worker.published.js",
+			"lastModified": "2022-01-17T21:47:43.101Z"
+		},
+		{
+			"relativeFilePath": "\\index.html",
+			"lastModified": "2022-01-17T22:39:21.587Z"
+		},
+		{
+			"relativeFilePath": "\\manifest.json",
+			"lastModified": "2022-01-17T22:30:39.525Z"
+		},
+		{
+			"relativeFilePath": "\\pwa-192.png",
+			"lastModified": "2022-01-17T22:30:39.195Z"
+		},
+		{
+			"relativeFilePath": "\\pwa-512.png",
+			"lastModified": "2022-01-17T22:30:38.873Z"
 		}
 	]
 }

@@ -35,4 +35,4 @@ app.UseResponseCompression();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
-await app.RunAsync("https://0.0.0.0:7260");
+await app.RunAsync("https://0.0.0.0:7107");

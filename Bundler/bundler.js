@@ -9,6 +9,7 @@ import ffmpeg from 'ffmpeg-static'
 import commandExistsSync from 'command-exists'
 import { ImagePool } from '@squoosh/lib'
 import { cpus } from 'os'
+import { minify } from 'terser'
 
 // Global Variables //
 
@@ -128,7 +129,9 @@ async function processing()
 
     const imagePool = new ImagePool(cpus().length)
     const files = findFiles(__client_wwwrootdev_dirname)
+    const swjsFiles = filterFiles(files, 'js').filter(file => String(file.name) == 'service-worker.js' || String(file.name) == 'service-worker.published.js')
     const sassFile = join(__client_wwwrootdev_dirname, 'sass', 'bundle.sass')
+    const htmlFiles = filterFiles(files, 'html')
     const svgFiles = filterFiles(files, 'svg')
     const jsonFiles = filterFiles(files, 'json')
     const woff2Files = filterFiles(files, 'woff2')
@@ -142,7 +145,7 @@ async function processing()
         console.log('  | Minifying SASS: ' + minCSSFilePath.replace(__client_wwwroot_dirname, ''))
         const result = sass.renderSync(
         {
-            file: sassFile, sourceMap: true, outFile: 'bundle.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true, includePaths: [join(__client_wwwrootdev_dirname, 'sass', 'thirdparty')]
+            file: sassFile, sourceMap: true, outFile: isDebug ? 'bundle.css' : 'bundle.min.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
         })
         if (fileExists(minCSSFilePath))
         {
@@ -161,6 +164,28 @@ async function processing()
         console.error('  | sass Minification Error: ' + e)
         console.error('  | ------------------------------------------------------------------------------------------------')
     }
+
+    swjsFiles.forEach(async item =>
+    {
+        if (needsCaching(item.path, 'js') || needsProcessing(item.path))
+        {
+            const output = item.path.replace('wwwroot-dev', 'wwwroot')
+            console.log('  | Minifying Service Worker: ' + item.path.replace(__client_wwwrootdev_dirname, '') + ' > ' + output.replace(__client_wwwroot_dirname, ''))
+            const result = await minify(readFileSync(item.path, 'utf8'), { sourceMap: false, module: false, mangle: false, ecma: 2021, compress: true })
+            writeFileSync(output, result.code, 'utf8')
+        }
+    })
+
+    htmlFiles.forEach(item =>
+    {
+        if (needsCaching(item.path, 'html') || needsProcessing(item.path))
+        {
+            const output = item.path.replace('wwwroot-dev', 'wwwroot')
+            console.log('  | Copying HTML: ' + item.path.replace(__client_wwwrootdev_dirname, '') + ' > ' + output.replace(__client_wwwroot_dirname, ''))
+            mkdirSync(dirname(output), { recursive: true })
+            copyFileSync(item.path, output)
+        }
+    })
 
     svgFiles.forEach(item =>
     {
