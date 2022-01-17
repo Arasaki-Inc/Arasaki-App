@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Security.Authentication;
 
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Identity.Web;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseKestrel(ko => ko.ConfigureHttpsDefaults(o => o.SslProtocols = SslProtocols.Tls13));
 #if DEBUG
 builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = "00000000-0000-0000-0000-000000000000" });
 #else
