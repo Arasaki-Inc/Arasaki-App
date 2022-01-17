@@ -1,0 +1,92 @@
+{
+	"cached": [
+		{
+			"relativeFilePath": "\\appsettings.json",
+			"lastModified": "2022-01-17T21:33:39.715Z"
+		},
+		{
+			"relativeFilePath": "\\manifest.json",
+			"lastModified": "2022-01-17T21:41:43.009Z"
+		},
+		{
+			"relativeFilePath": "\\pwa-192.png",
+			"lastModified": "2022-01-17T21:33:55.480Z"
+		},
+		{
+			"relativeFilePath": "\\pwa-512.png",
+			"lastModified": "2022-01-17T21:34:01.801Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-Black.woff2",
+			"lastModified": "2021-12-24T18:05:53.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-BlackItalic.woff2",
+			"lastModified": "2021-12-24T18:05:53.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-Bold.woff2",
+			"lastModified": "2021-12-24T18:05:53.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-BoldItalic.woff2",
+			"lastModified": "2021-12-24T18:05:54.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-ExtraBold.woff2",
+			"lastModified": "2021-12-24T18:05:54.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-ExtraBoldItalic.woff2",
+			"lastModified": "2021-12-24T18:05:55.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-ExtraLight.woff2",
+			"lastModified": "2021-12-24T18:05:55.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-ExtraLightItalic.woff2",
+			"lastModified": "2021-12-24T18:05:55.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-Italic.woff2",
+			"lastModified": "2021-12-24T18:05:56.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-Light.woff2",
+			"lastModified": "2021-12-24T18:05:56.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-LightItalic.woff2",
+			"lastModified": "2021-12-24T18:05:56.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-Medium.woff2",
+			"lastModified": "2021-12-24T18:05:57.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-MediumItalic.woff2",
+			"lastModified": "2021-12-24T18:05:57.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-Regular.woff2",
+			"lastModified": "2021-12-24T18:05:57.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-SemiBold.woff2",
+			"lastModified": "2021-12-24T18:05:58.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-SemiBoldItalic.woff2",
+			"lastModified": "2021-12-24T18:05:52.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-Thin.woff2",
+			"lastModified": "2021-12-24T18:05:52.000Z"
+		},
+		{
+			"relativeFilePath": "\\webfonts\\Montserrat-ThinItalic.woff2",
+			"lastModified": "2021-12-24T18:05:52.000Z"
+		}
+	]
+}
