@@ -22,7 +22,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
     - name: Install Dotnet WASM Tools
       run: dotnet workload install wasm-tools
-    - name: Checkout submodules
+    - name: Checkout Submodules
       run: git submodule update --init --recursive
     - name: Restore Dependencies
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
