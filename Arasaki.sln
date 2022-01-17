@@ -9,6 +9,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.Client", "Arasaki\C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.Shared", "Arasaki\Shared\Arasaki.Shared.csproj", "{8B04EE73-495C-48ED-9076-6ACA9F33F77D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{AE1165D5-9EC2-43B3-BC1E-F21EEEAA7553}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bundler", "Bundler", "{CC6BCFCE-65E9-40E3-B12E-ED2C6E91485C}"
+	ProjectSection(SolutionItems) = preProject
+		Bundler\arasaki-cache.json = Bundler\arasaki-cache.json
+		Bundler\arasaki-config.json = Bundler\arasaki-config.json
+		Bundler\bundle_debug.cmd = Bundler\bundle_debug.cmd
+		Bundler\bundle_release.cmd = Bundler\bundle_release.cmd
+		Bundler\bundler.js = Bundler\bundler.js
+		Bundler\package-lock.json = Bundler\package-lock.json
+		Bundler\package.json = Bundler\package.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
