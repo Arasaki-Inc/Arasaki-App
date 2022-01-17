@@ -11,7 +11,7 @@ env:
   DOTNET_CORE_VERSION: 6.0.x
   WORKING_DIRECTORY: Arasaki/Server
 jobs:
-  build-and-deploy:
+  Publish-To-Azure:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -19,15 +19,17 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-    - name: Restore
+    - name: Install Dotnet WASM Tools
+      run: dotnet workload install wasm-tools
+    - name: Restore Dependencies
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
-    - name: Build
+    - name: Build App
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
-    - name: Test
+    - name: Test App
       run: dotnet test "${{ env.WORKING_DIRECTORY }}" --no-build
-    - name: Publish
+    - name: Publish Release Build
       run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
-    - name: Deploy to Azure WebApp
+    - name: Publish To Microsoft Azure
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
