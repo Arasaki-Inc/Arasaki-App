@@ -1,7 +1,10 @@
-using Arasaki.Client;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
+using Arasaki.Client;
+using Arasaki.Client.Data.Authentication;
 
 using Serilog;
 
@@ -19,4 +22,11 @@ HostBuilder.Services.AddMsalAuthentication(options =>
     HostBuilder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
     options.ProviderOptions.DefaultAccessTokenScopes.Add("api://api.id.uri/access_as_user");
 });
-await HostBuilder.Build().RunAsync();
+HostBuilder.Services.AddAuthorizationCore(o =>
+{
+    o.AddPolicy("UserIsAdmin", policy => policy.Requirements.Add(new UserGroupsRequirement(new string[] { "Admins" })));
+});
+HostBuilder.Services.AddSingleton<IAuthorizationHandler, UserGroupsHandler>();
+Host = HostBuilder.Build();
+Services.SetServiceProvider(Host.Services);
+await Host.RunAsync();
