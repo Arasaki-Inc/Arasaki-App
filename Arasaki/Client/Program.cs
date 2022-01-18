@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -19,8 +19,8 @@ HostBuilder.Services.AddHttpClient("Arasaki.ServerAPI", client => client.BaseAdd
 HostBuilder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Arasaki.ServerAPI"));
 HostBuilder.Services.AddMsalAuthentication(options =>
 {
-    HostBuilder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
-    options.ProviderOptions.DefaultAccessTokenScopes.Add("api://api.id.uri/access_as_user");
+    HostBuilder.Configuration.Bind("AzureAdB2C", options.ProviderOptions.Authentication);
+    options.ProviderOptions.DefaultAccessTokenScopes.Add("https://arasakiB2C.onmicrosoft.com/6a29b831-2d5a-4421-9c7d-4905f3c3e9e2/API.Access");
 });
 HostBuilder.Services.AddAuthorizationCore(o =>
 {

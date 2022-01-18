@@ -1,10 +1,6 @@
 {
 	"cached": [
 		{
-			"relativeFilePath": "\\appsettings.json",
-			"lastModified": "2022-01-17T21:33:39.715Z"
-		},
-		{
 			"relativeFilePath": "\\webfonts\\Montserrat-Black.woff2",
 			"lastModified": "2021-12-24T18:05:53.000Z"
 		},
@@ -99,6 +95,14 @@
 		{
 			"relativeFilePath": "\\pwa-512.png",
 			"lastModified": "2022-01-17T22:30:38.873Z"
+		},
+		{
+			"relativeFilePath": "\\well-known\\microsoft-identity-association.json",
+			"lastModified": "2022-01-18T00:48:30.900Z"
+		},
+		{
+			"relativeFilePath": "\\appsettings.json",
+			"lastModified": "2022-01-18T01:53:18.767Z"
 		}
 	]
 }
