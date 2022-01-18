@@ -20,9 +20,9 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-    - name: Install Dotnet WASM Tools
+    - name: Setup .NET WASM
       run: dotnet workload install wasm-tools
-    - name: Checkout Submodules
+    - name: Setup Submodules
       run: git submodule update --init --recursive
     - name: Restore Dependencies
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
@@ -31,19 +31,19 @@ jobs:
         cd Bundler
         npm i
         npm run build:release
-    - name: Build App
+    - name: Build Release Executable
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
-    - name: Test App
+    - name: Test Release Executable
       run: dotnet test "${{ env.WORKING_DIRECTORY }}" --no-build
-    - name: Publish Release Build
+    - name: Publish Release Executable
       run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
-    - name: Publish To Microsoft Azure
+    - name: Publish Arasaki Release Executable To Microsoft Azure
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
         publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
-    - name: Publish Artifacts
+    - name: Publish Arasaki Artifacts To Microsoft Azure
       uses: actions/upload-artifact@v1.0.0
       with:
         name: webapp
