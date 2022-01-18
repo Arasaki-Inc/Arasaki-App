@@ -1,8 +1,0 @@
-{
-	"jsDependencies": [
-		"GSAP\\dist\\gsap.js",
-		"GSAP\\dist\\EasePack.js",
-		"GSAP\\dist\\CSSRulePlugin.js",
-		"GSAP\\dist\\ScrollToPlugin.js"
-	]
-}

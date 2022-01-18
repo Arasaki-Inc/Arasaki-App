@@ -19,7 +19,6 @@ const __dirname = resolve()
 const __client_dirname = join(__dirname, '../', __project_name, 'Client')
 const __client_wwwroot_dirname = join(__client_dirname, 'wwwroot')
 const __client_wwwrootdev_dirname = join(__client_dirname, 'wwwroot-dev')
-const __config_filename = join(__dirname, __project_name.toLocaleLowerCase() + '-config.json')
 const __cache_filename = join(__dirname, __project_name.toLocaleLowerCase() + '-cache.json')
 
 var isDebug
@@ -70,18 +69,6 @@ function findFiles(path)
 function filterFiles(files, ext)
 {
     return Object.values(files).filter(file => String(file.name).split('.').pop() == ext)
-}
-
-function loadConfig()
-{
-    if (fileExists(__config_filename))
-    {
-        config = JSON.parse(readFileSync(__config_filename))
-    }
-    else
-    {
-        writeFileSync(__config_filename, JSON.stringify(config, null, "\t"), 'utf8')
-    }
 }
 
 function addCacheEntry(filepath)
