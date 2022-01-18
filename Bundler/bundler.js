@@ -29,11 +29,6 @@ var isDebug
 
 // JSON //
 
-var config =
-{
-    jsDependencies: []
-}
-
 var cacheEntities =
 {
     cached: []
@@ -347,7 +342,6 @@ async function processing()
         }
     })
 
-    loadConfig()
     await processing()
     if (isDebug)
     {
