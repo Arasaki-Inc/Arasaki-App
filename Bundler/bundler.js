@@ -145,7 +145,7 @@ async function processing()
         console.log('  | Minifying SASS: ' + minCSSFilePath.replace(__client_wwwroot_dirname, ''))
         const result = sass.renderSync(
         {
-            file: sassFile, sourceMap: true, outFile: isDebug ? 'bundle.css' : 'bundle.min.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
+            file: sassFile, sourceMap: true, outFile: 'bundle.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
         })
         if (fileExists(minCSSFilePath))
         {
