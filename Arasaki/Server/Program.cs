@@ -4,7 +4,6 @@ using System.Security.Authentication;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Identity.Web;
 
 using Serilog;
@@ -50,18 +49,6 @@ else
 }
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
-PhysicalFileProvider fileProvider = new(Path.Combine(builder.Environment.WebRootPath, ".well-known"));
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = fileProvider,
-    RequestPath = "/.well-known"
-});
-
-app.UseDirectoryBrowser(new DirectoryBrowserOptions
-{
-    FileProvider = fileProvider,
-    RequestPath = "/.well-known"
-});
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
