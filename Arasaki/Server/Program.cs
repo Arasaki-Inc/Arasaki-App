@@ -13,6 +13,7 @@ Logger.Initialise(new LoggerConfiguration().WriteTo.Console(outputTemplate: Logg
 
 WebApplicationBuilder builder;
 Services.SetConfiguration((builder = WebApplication.CreateBuilder(args)).Configuration);
+if (string.IsNullOrWhiteSpace(builder.Environment.WebRootPath)) builder.Environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 
 builder.WebHost.UseKestrel(ko => ko.ConfigureHttpsDefaults(o => o.SslProtocols = SslProtocols.Tls13));
 #if DEBUG
