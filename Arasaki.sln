@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bundler", "Bundler", "{CC6B
 	ProjectSection(SolutionItems) = preProject
 		Bundler\arasaki-cache.json = Bundler\arasaki-cache.json
 		Bundler\bundle_debug.cmd = Bundler\bundle_debug.cmd
+		Bundler\bundle_install.cmd = Bundler\bundle_install.cmd
 		Bundler\bundle_release.cmd = Bundler\bundle_release.cmd
 		Bundler\bundler.js = Bundler\bundler.js
 		Bundler\package-lock.json = Bundler\package-lock.json
