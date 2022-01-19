@@ -19,9 +19,13 @@
 
   <ItemGroup>
     <Compile Remove="wwwroot-dev\**" />
+    <Compile Remove="wwwroot\**" />
     <Content Remove="wwwroot-dev\**" />
+    <Content Remove="wwwroot\**" />
     <EmbeddedResource Remove="wwwroot-dev\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
     <None Remove="wwwroot-dev\**" />
+    <None Remove="wwwroot\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,7 +50,6 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

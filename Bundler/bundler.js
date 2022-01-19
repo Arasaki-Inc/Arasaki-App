@@ -102,6 +102,41 @@ function needsProcessing(proc_dirname_dev, proc_dirname)
     return needsProc
 }
 
+async function minifyTypescript(item, proc_dirname, proc_dirname_dev, singular)
+{
+    if (needsCaching(item.path, 'ts') || needsProcessing(item.path))
+    {
+        try
+        {
+            const output = singular ? item.path.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js') : join(proc_dirname, 'bundle.min.js')
+            console.log('  | Minifying Typescript: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
+            execSync('npx tsc ' + (singular ? '' : '--build --force ') + item.path + ' --outFile "' + output + '"' + (singular ? '' : ' --rootDir "' + join(proc_dirname_dev + '"', 'ts')) +
+                ' --target ES2021 --lib DOM,ES2021,WebWorker --module amd --allowSyntheticDefaultImports --esModuleInterop --forceConsistentCasingInFileNames --strict --skipLibCheck', err =>
+            {
+                if (err)
+                {
+                    throw err
+                }
+            })
+            const result = await minify(readFileSync(output, 'utf8'), { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: true })
+            truncateSync(output)
+            const mapFilename = output.replace('.js', '.js.map')
+            if (fileExists(mapFilename))
+            {
+                truncateSync(mapFilename)
+            }
+            writeFileSync(output, result.code, 'utf8')
+            writeFileSync(mapFilename, result.map, 'utf8')
+        }
+        catch (e)
+        {
+            console.error('  | ------------------------------------------------------------------------------------------------')
+            console.error('  | Typescript Minification Error: ' + e)
+            console.error('  | ------------------------------------------------------------------------------------------------')
+        }
+    }
+}
+
 async function processing(proc_dirname, proc_dirname_dev)
 {
     console.log('\\  Changes Made > Running Bundle Pass...')
@@ -109,11 +144,12 @@ async function processing(proc_dirname, proc_dirname_dev)
 
     const imagePool = new ImagePool(cpus().length)
     const files = findFiles(proc_dirname_dev)
-    const swjsFiles = filterFiles(files, 'js').filter(file => String(file.name) == 'service-worker.js' || String(file.name) == 'service-worker.published.js')
+    const tsFiles = filterFiles(files, 'ts').filter(file => String(file.name) != 'service-worker.ts' && String(file.name) != 'service-worker.published.ts')
+    const swtsFiles = filterFiles(files, 'ts').filter(file => String(file.name) == 'service-worker.ts' || String(file.name) == 'service-worker.published.ts')
     const sassFile = join(proc_dirname_dev, 'sass', 'bundle.sass')
     const htmlFiles = filterFiles(files, 'html')
     const svgFiles = filterFiles(files, 'svg')
-    const jsonFiles = filterFiles(files, 'json')
+    const jsonFiles = filterFiles(files, 'json').filter(file => String(file.name) != 'tsconfig.json')
     const woff2Files = filterFiles(files, 'woff2')
     const pngFiles = filterFiles(files, 'png')
     const h264Files = filterFiles(files, 'mp4')
@@ -141,26 +177,18 @@ async function processing(proc_dirname, proc_dirname_dev)
     catch (e)
     {
         console.error('  | ------------------------------------------------------------------------------------------------')
-        console.error('  | sass Minification Error: ' + e)
+        console.error('  | SASS Minification Error: ' + e)
         console.error('  | ------------------------------------------------------------------------------------------------')
     }
 
-    swjsFiles.forEach(async item =>
-    {
-        if (needsCaching(item.path, 'js') || needsProcessing(item.path))
-        {
-            const output = item.path.replace('wwwroot-dev', 'wwwroot')
-            console.log('  | Minifying Service Worker: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
-            const result = await minify(readFileSync(item.path, 'utf8'), { sourceMap: false, module: false, mangle: false, ecma: 2021, compress: true })
-            writeFileSync(output, result.code, 'utf8')
-        }
-    })
+    tsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, false))
+    swtsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, true))
 
     htmlFiles.forEach(item =>
     {
         if (needsCaching(item.path, 'html') || needsProcessing(item.path))
         {
-            const output = item.path.replace('wwwroot-dev', 'wwwroot')
+            const output = item.path.replace(proc_dirname_dev, proc_dirname)
             console.log('  | Copying HTML: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
             copyFileSync(item.path, output)
@@ -171,7 +199,7 @@ async function processing(proc_dirname, proc_dirname_dev)
     {
         if (needsCaching(item.path, 'svg') || needsProcessing(item.path))
         {
-            const output = item.path.replace('wwwroot-dev', 'wwwroot')
+            const output = item.path.replace(proc_dirname_dev, proc_dirname)
             console.log('  | Copying SVG: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
             copyFileSync(item.path, output)
@@ -204,7 +232,7 @@ async function processing(proc_dirname, proc_dirname_dev)
     {
         if (needsCaching(item.path, 'webp') || needsProcessing(item.path))
         {
-            const output = item.path.replace('wwwroot-dev', 'wwwroot').replace('.png', '.webp')
+            const output = item.path.replace(proc_dirname_dev, proc_dirname).replace('.png', '.webp')
             console.log('  | Transcoding Image: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
             if (fileExists(item.path.replace(proc_dirname_dev, proc_dirname)))
@@ -275,29 +303,39 @@ async function processing(proc_dirname, proc_dirname_dev)
     {
         if (needsCaching(item.path, 'mp4') || needsProcessing(item.path))
         {
-            const output = item.path.replace('wwwroot-dev', 'wwwroot')
+            const output = item.path.replace(proc_dirname_dev, proc_dirname)
             console.log('  | Transcoding Video: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
-            mkdirSync(dirname(output), { recursive: true })
-            if (commandExistsSync('ffmpeg'))
+
+            try
             {
-                execSync('start cmd /C ffmpeg -y -i ' + item.path + (isDebug ? ' -c:v librav1e -rav1e-params speed=10:low_latency=true' : ' -c:v librav1e -b:v 200K -rav1e-params speed=0:low_latency=true') + ' -movflags +faststart -c:a libopus -q:a 128 ' + output, err =>
+                mkdirSync(dirname(output), { recursive: true })
+                if (commandExistsSync('ffmpeg'))
                 {
-                    if (err)
+                    execSync('start cmd /C ffmpeg -y -i ' + item.path + (isDebug ? ' -c:v librav1e -rav1e-params speed=10:low_latency=true' : ' -c:v librav1e -b:v 200K -rav1e-params speed=0:low_latency=true') + ' -movflags +faststart -c:a libopus -q:a 128 ' + output, err =>
                     {
-                        throw err
-                    }
-                })
+                        if (err)
+                        {
+                            throw err
+                        }
+                    })
+                }
+                else
+                {
+                    console.error('No non-GPL compliant FFmpeg build detected in enviroment variables - falling back to libaom, video transcoding will take substantially longer and will be much lower quality!')
+                    execSync('start cmd /C ' + ffmpeg + ' -y -i ' + item.path + ' -c:v libaom-av1 ' + (isDebug ? '-crf 52' : '-crf 30 -b:v 200k') + ' -movflags +faststart -c:a libopus -q:a 128 ' + output, err =>
+                    {
+                        if (err)
+                        {
+                            throw err
+                        }
+                    })
+                }
             }
-            else
+            catch (e)
             {
-                console.error('No non-GPL compliant FFmpeg build detected in enviroment variables - falling back to libaom, video transcoding will take substantially longer and will be much lower quality!')
-                execSync('start cmd /C ' + ffmpeg + ' -y -i ' + item.path + ' -c:v libaom-av1 ' + (isDebug ? '-crf 52' : '-crf 30 -b:v 200k') + ' -movflags +faststart -c:a libopus -q:a 128 ' + output, err =>
-                {
-                    if (err)
-                    {
-                        throw err
-                    }
-                })
+                console.error('  | ------------------------------------------------------------------------------------------------')
+                console.error('  | FFMPEG Transcoding Error: ' + e)
+                console.error('  | ------------------------------------------------------------------------------------------------')
             }
         }
     })
