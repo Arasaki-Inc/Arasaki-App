@@ -1,6 +1,7 @@
 import { join, resolve, dirname, sep } from 'path'
 import { constants, readFileSync, writeFileSync, statSync, accessSync, truncateSync, unlinkSync, readdirSync, mkdirSync, copyFileSync } from 'fs'
 import { execSync } from 'child_process'
+import process from 'process'
 
 import chokidar from 'chokidar'
 import getFolderSize from 'get-folder-size'
@@ -16,9 +17,6 @@ import { minify } from 'terser'
 const __project_name = 'Arasaki'
 
 const __dirname = resolve()
-const __client_dirname = join(__dirname, '../', __project_name, 'Client')
-const __client_wwwroot_dirname = join(__client_dirname, 'wwwroot')
-const __client_wwwrootdev_dirname = join(__client_dirname, 'wwwroot-dev')
 const __cache_filename = join(__dirname, __project_name.toLocaleLowerCase() + '-cache.json')
 
 var isDebug
@@ -66,11 +64,11 @@ function filterFiles(files, ext)
     return Object.values(files).filter(file => String(file.name).split('.').pop() == ext)
 }
 
-function addCacheEntry(filepath)
+function addCacheEntry(proc_dirname_dev, proc_dirname)
 {
-    const relativeFilePath = filepath.replace(__client_wwwrootdev_dirname, '')
+    const relativeFilePath = proc_dirname_dev.replace(proc_dirname, '')
     cacheEntities.cached = cacheEntities.cached.filter(f => f.relativeFilePath !== relativeFilePath)
-    cacheEntities.cached.push({ relativeFilePath: relativeFilePath, lastModified: statSync(filepath).mtime })
+    cacheEntities.cached.push({ relativeFilePath: relativeFilePath, lastModified: statSync(proc_dirname_dev).mtime })
     if (fileExists(__cache_filename))
     {
         truncateSync(__cache_filename, 0)
@@ -78,41 +76,41 @@ function addCacheEntry(filepath)
     writeFileSync(__cache_filename, JSON.stringify(cacheEntities, null, "\t"), 'utf8')
 }
 
-function needsCaching(filepath, procExt)
+function needsCaching(proc_dirname_dev, proc_dirname, procExt)
 {
     if (fileExists(__cache_filename))
     {
         cacheEntities = JSON.parse(readFileSync(__cache_filename))
     }
-    const procFilePath = filepath.replace(__client_wwwrootdev_dirname, __client_wwwroot_dirname)
-    const containsEntry = cacheEntities.cached.some(file => file.relativeFilePath === filepath.replace(__client_wwwrootdev_dirname, ''))
+    const procFilePath = proc_dirname_dev.replace(proc_dirname, proc_dirname_dev)
+    const containsEntry = cacheEntities.cached.some(file => file.relativeFilePath === proc_dirname_dev.replace(proc_dirname, ''))
     if (!containsEntry)
     {
-        addCacheEntry(filepath)
+        addCacheEntry(proc_dirname_dev)
     }
     return !(containsEntry && fileExists(procFilePath.substring(0, procFilePath.lastIndexOf('.')) + '.' + procExt))
 }
 
-function needsProcessing(filepath)
+function needsProcessing(proc_dirname_dev, proc_dirname)
 {
-    const cachedFile = cacheEntities.cached.filter(file => file.relativeFilePath === filepath.replace(__client_wwwrootdev_dirname, ''))[0]
-    const needsProc = new Date(cachedFile.lastModified).getTime() < statSync(filepath).mtime.getTime()
+    const cachedFile = cacheEntities.cached.filter(file => file.relativeFilePath === proc_dirname_dev.replace(proc_dirname, ''))[0]
+    const needsProc = new Date(cachedFile.lastModified).getTime() < statSync(proc_dirname_dev).mtime.getTime()
     if (needsProc)
     {
-        addCacheEntry(filepath)
+        addCacheEntry(proc_dirname_dev)
     }
     return needsProc
 }
 
-async function processing()
+async function processing(proc_dirname, proc_dirname_dev)
 {
     console.log('\\  Changes Made > Running Bundle Pass...')
     console.log(' \\')
 
     const imagePool = new ImagePool(cpus().length)
-    const files = findFiles(__client_wwwrootdev_dirname)
+    const files = findFiles(proc_dirname_dev)
     const swjsFiles = filterFiles(files, 'js').filter(file => String(file.name) == 'service-worker.js' || String(file.name) == 'service-worker.published.js')
-    const sassFile = join(__client_wwwrootdev_dirname, 'sass', 'bundle.sass')
+    const sassFile = join(proc_dirname_dev, 'sass', 'bundle.sass')
     const htmlFiles = filterFiles(files, 'html')
     const svgFiles = filterFiles(files, 'svg')
     const jsonFiles = filterFiles(files, 'json')
@@ -122,9 +120,9 @@ async function processing()
 
     try
     {
-        const minCSSFilePath = __client_wwwroot_dirname + sep + 'bundle.min.css'
-        const minMapFilePath = __client_wwwroot_dirname + sep + 'bundle.css.map'
-        console.log('  | Minifying SASS: ' + minCSSFilePath.replace(__client_wwwroot_dirname, ''))
+        const minCSSFilePath = proc_dirname + sep + 'bundle.min.css'
+        const minMapFilePath = proc_dirname + sep + 'bundle.css.map'
+        console.log('  | Minifying SASS: ' + minCSSFilePath.replace(proc_dirname, ''))
         const result = sass.renderSync(
         {
             file: sassFile, sourceMap: true, outFile: 'bundle.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
@@ -152,7 +150,7 @@ async function processing()
         if (needsCaching(item.path, 'js') || needsProcessing(item.path))
         {
             const output = item.path.replace('wwwroot-dev', 'wwwroot')
-            console.log('  | Minifying Service Worker: ' + item.path.replace(__client_wwwrootdev_dirname, '') + ' > ' + output.replace(__client_wwwroot_dirname, ''))
+            console.log('  | Minifying Service Worker: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             const result = await minify(readFileSync(item.path, 'utf8'), { sourceMap: false, module: false, mangle: false, ecma: 2021, compress: true })
             writeFileSync(output, result.code, 'utf8')
         }
@@ -163,7 +161,7 @@ async function processing()
         if (needsCaching(item.path, 'html') || needsProcessing(item.path))
         {
             const output = item.path.replace('wwwroot-dev', 'wwwroot')
-            console.log('  | Copying HTML: ' + item.path.replace(__client_wwwrootdev_dirname, '') + ' > ' + output.replace(__client_wwwroot_dirname, ''))
+            console.log('  | Copying HTML: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
             copyFileSync(item.path, output)
         }
@@ -174,7 +172,7 @@ async function processing()
         if (needsCaching(item.path, 'svg') || needsProcessing(item.path))
         {
             const output = item.path.replace('wwwroot-dev', 'wwwroot')
-            console.log('  | Copying SVG: ' + item.path.replace(__client_wwwrootdev_dirname, '') + ' > ' + output.replace(__client_wwwroot_dirname, ''))
+            console.log('  | Copying SVG: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
             copyFileSync(item.path, output)
         }
@@ -184,8 +182,8 @@ async function processing()
     {
         if (needsCaching(item.path, 'json') || needsProcessing(item.path))
         {
-            const output = item.path.replace(__client_wwwrootdev_dirname, __client_wwwroot_dirname)
-            console.log('  | Copying JSON: ' + item.path.replace(__client_wwwrootdev_dirname, '') + ' > ' + output.replace(__client_wwwroot_dirname, ''))
+            const output = item.path.replace(proc_dirname_dev, proc_dirname)
+            console.log('  | Copying JSON: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
             copyFileSync(item.path, output)
         }
@@ -195,8 +193,8 @@ async function processing()
     {
         if (needsCaching(item.path, 'woff2') || needsProcessing(item.path))
         {
-            const output = item.path.replace(__client_wwwrootdev_dirname, __client_wwwroot_dirname)
-            console.log('  | Copying Font: ' + item.path.replace(__client_wwwrootdev_dirname, '') + ' > ' + output.replace(__client_wwwroot_dirname, ''))
+            const output = item.path.replace(proc_dirname_dev, proc_dirname)
+            console.log('  | Copying Font: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
             copyFileSync(item.path, output)
         }
@@ -207,11 +205,11 @@ async function processing()
         if (needsCaching(item.path, 'webp') || needsProcessing(item.path))
         {
             const output = item.path.replace('wwwroot-dev', 'wwwroot').replace('.png', '.webp')
-            console.log('  | Transcoding Image: ' + item.path.replace(__client_wwwrootdev_dirname, '') + ' > ' + output.replace(__client_wwwroot_dirname, ''))
+            console.log('  | Transcoding Image: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
-            if (fileExists(item.path.replace(__client_wwwrootdev_dirname, __client_wwwroot_dirname)))
+            if (fileExists(item.path.replace(proc_dirname_dev, proc_dirname)))
             {
-                unlinkSync(item.path.replace(__client_wwwrootdev_dirname, __client_wwwroot_dirname))
+                unlinkSync(item.path.replace(proc_dirname_dev, proc_dirname))
             }
             try
             {
@@ -278,7 +276,7 @@ async function processing()
         if (needsCaching(item.path, 'mp4') || needsProcessing(item.path))
         {
             const output = item.path.replace('wwwroot-dev', 'wwwroot')
-            console.log('  | Transcoding Video: ' + item.path.replace(__client_wwwrootdev_dirname, '') + ' > ' + output.replace(__client_wwwroot_dirname, ''))
+            console.log('  | Transcoding Video: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
             if (commandExistsSync('ffmpeg'))
             {
@@ -304,8 +302,8 @@ async function processing()
         }
     })
 
-    const inputSize = await getFolderSize.loose(__client_wwwrootdev_dirname)
-    const outputSize = await getFolderSize.loose(__client_wwwroot_dirname)
+    const inputSize = await getFolderSize.loose(proc_dirname_dev)
+    const outputSize = await getFolderSize.loose(proc_dirname)
     console.log('  |')
     console.log('  | > Size Before: ' + inputSize.toLocaleString('en') + ' bytes')
     console.log('  | > Size After:  ' + outputSize.toLocaleString('en') + ' bytes')
@@ -342,12 +340,26 @@ async function processing()
         }
     })
 
-    await processing()
+    process.title = "Arasaki Bundler"
+
+    const __client_dirname = join(__dirname, '../', __project_name, 'Client')
+    //const __server_dirname = join(__dirname, '../', __project_name, 'Server')
+    await processing(join(__client_dirname, 'wwwroot'), join(__client_dirname, 'wwwroot-dev'))
+    //await processing(join(__server_dirname, 'wwwroot'), join(__server_dirname, 'wwwroot-dev'))
     if (isDebug)
     {
-        chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true }).on('change', async () =>
+        chokidar.watch(__dirname, { awaitWriteFinish: true }).on('change', async path =>
         {
-            await processing()
+            if (path.toString().contains(join(__client_dirname, 'wwwroot-dev')))
+            {
+                await processing(join(__client_dirname, 'wwwroot'), join(__client_dirname, 'wwwroot-dev'))
+            }
+            /*
+            else if (path.toString().contains(join(__server_dirname, 'wwwroot-dev')))
+            {
+                await processing(join(__server_dirname, 'wwwroot'), join(__server_dirname, 'wwwroot-dev'))
+            }
+            */
         });
     }
 })()
