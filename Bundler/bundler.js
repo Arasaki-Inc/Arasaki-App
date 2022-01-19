@@ -102,6 +102,17 @@ function needsProcessing(proc_dirname_dev, proc_dirname)
     return needsProc
 }
 
+function runFileAction(identifier, proc_dirname, proc_dirname_dev, itempath)
+{
+    if (needsCaching(itempath, identifier.toLocaleLowerCase()) || needsProcessing(itempath))
+    {
+        const output = itempath.replace(proc_dirname_dev, proc_dirname)
+        console.log('  | Copying ' + identifier.toUpperCase() + ': ' + itempath.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
+        mkdirSync(dirname(output), { recursive: true })
+        copyFileSync(itempath, output)
+    }
+}
+
 async function minifyTypescript(item, proc_dirname, proc_dirname_dev, bundle)
 {
     if (needsCaching(item.path, 'ts') || needsProcessing(item.path))
@@ -183,51 +194,10 @@ async function processing(proc_dirname, proc_dirname_dev)
 
     tsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, true))
     swtsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, false))
-
-    htmlFiles.forEach(item =>
-    {
-        if (needsCaching(item.path, 'html') || needsProcessing(item.path))
-        {
-            const output = item.path.replace(proc_dirname_dev, proc_dirname)
-            console.log('  | Copying HTML: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
-            mkdirSync(dirname(output), { recursive: true })
-            copyFileSync(item.path, output)
-        }
-    })
-
-    svgFiles.forEach(item =>
-    {
-        if (needsCaching(item.path, 'svg') || needsProcessing(item.path))
-        {
-            const output = item.path.replace(proc_dirname_dev, proc_dirname)
-            console.log('  | Copying SVG: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
-            mkdirSync(dirname(output), { recursive: true })
-            copyFileSync(item.path, output)
-        }
-    })
-
-    jsonFiles.forEach(item =>
-    {
-        if (needsCaching(item.path, 'json') || needsProcessing(item.path))
-        {
-            const output = item.path.replace(proc_dirname_dev, proc_dirname)
-            console.log('  | Copying JSON: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
-            mkdirSync(dirname(output), { recursive: true })
-            copyFileSync(item.path, output)
-        }
-    })
-
-    woff2Files.forEach(item =>
-    {
-        if (needsCaching(item.path, 'woff2') || needsProcessing(item.path))
-        {
-            const output = item.path.replace(proc_dirname_dev, proc_dirname)
-            console.log('  | Copying Font: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
-            mkdirSync(dirname(output), { recursive: true })
-            copyFileSync(item.path, output)
-        }
-    })
-
+    htmlFiles.forEach(item => runFileAction('html', proc_dirname, proc_dirname_dev, item.path))
+    svgFiles.forEach(item => runFileAction('svg', proc_dirname, proc_dirname_dev, item.path))
+    jsonFiles.forEach(item => runFileAction('json', proc_dirname, proc_dirname_dev, item.path))
+    woff2Files.forEach(item => runFileAction('woff2', proc_dirname, proc_dirname_dev, item.path))
     pngFiles.forEach(async item =>
     {
         if (needsCaching(item.path, 'webp') || needsProcessing(item.path))
