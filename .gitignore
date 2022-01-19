@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Custom
 Arasaki/Client/wwwroot/**/*
+Bundler/arasaki-cache.json
