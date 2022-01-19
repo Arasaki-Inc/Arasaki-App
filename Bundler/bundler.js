@@ -316,7 +316,6 @@ async function processing(proc_dirname, proc_dirname_dev)
 
 (async () =>
 {
-    // Dramatic Intro
     console.clear()
     console.log('####################################################################################################')
     console.log('##                                                                                                ##')
@@ -325,7 +324,6 @@ async function processing(proc_dirname, proc_dirname_dev)
     console.log('##                                  By Connor \'Stryxus\' Shearer.                                  ##')
     console.log('##                                                                                                ##')
     console.log('####################################################################################################\n')
-    //
 
     process.argv.forEach(item =>
     {
@@ -343,23 +341,18 @@ async function processing(proc_dirname, proc_dirname_dev)
     process.title = __project_name + " Bundler"
 
     const __client_dirname = join(__dirname, '../', __project_name, 'Client')
+    const __client_wwwroot_dirname = join(__client_dirname, 'wwwroot')
+    const __client_wwwrootdev_dirname = join(__client_dirname, 'wwwroot-dev')
     //const __server_dirname = join(__dirname, '../', __project_name, 'Server')
-    await processing(join(__client_dirname, 'wwwroot'), join(__client_dirname, 'wwwroot-dev'))
-    //await processing(join(__server_dirname, 'wwwroot'), join(__server_dirname, 'wwwroot-dev'))
+    //const __server_wwwroot_dirname = join(__server_dirname, 'wwwroot')
+    //const __server_wwwrootdev_dirname = join(__server_dirname, 'wwwroot-dev')
+    await processing(__client_wwwroot_dirname, __client_wwwrootdev_dirname)
+    //await processing(__server_wwwroot_dirname, __server_wwwrootdev_dirname)
     if (isDebug)
     {
-        chokidar.watch(__dirname, { awaitWriteFinish: true }).on('change', async path =>
+        chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true }).on('change', async path =>
         {
-            if (path.toString().contains(join(__client_dirname, 'wwwroot-dev')))
-            {
-                await processing(join(__client_dirname, 'wwwroot'), join(__client_dirname, 'wwwroot-dev'))
-            }
-            /*
-            else if (path.toString().contains(join(__server_dirname, 'wwwroot-dev')))
-            {
-                await processing(join(__server_dirname, 'wwwroot'), join(__server_dirname, 'wwwroot-dev'))
-            }
-            */
+            await processing(__client_wwwroot_dirname, __client_wwwrootdev_dirname)
         });
     }
 })()
