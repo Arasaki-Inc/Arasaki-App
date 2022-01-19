@@ -18,19 +18,18 @@ builder.WebHost.UseKestrel(ko => ko.ConfigureHttpsDefaults(o => o.SslProtocols =
 #if DEBUG
 builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = "00000000-0000-0000-0000-000000000000" });
 #else
-builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = Services.Configuration["APPINSIGHTS_CONNECTIONSTRING"] });
+builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = Services.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"] });
 #endif
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAdB2C"));
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]);
+builder.Services.AddServerSideBlazor();
 builder.Services.AddResponseCaching();
 builder.Services.AddResponseCompression(options =>
 {
     options.Providers.Add<BrotliCompressionProvider>();
     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "image/svg+xml" });
 });
-builder.Services.AddDirectoryBrowser();
 builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.SmallestSize);
 
 WebApplication app = builder.Build();
@@ -56,6 +55,7 @@ app.UseResponseCaching();
 app.UseResponseCompression();
 app.MapRazorPages();
 app.MapControllers();
-app.MapFallbackToFile("index.html");
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
 if (References.IsDevelopmentMode) await app.RunAsync("https://0.0.0.0:7107");
 else await app.RunAsync();

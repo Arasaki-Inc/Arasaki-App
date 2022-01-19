@@ -340,7 +340,7 @@ async function processing(proc_dirname, proc_dirname_dev)
         }
     })
 
-    process.title = "Arasaki Bundler"
+    process.title = __project_name + " Bundler"
 
     const __client_dirname = join(__dirname, '../', __project_name, 'Client')
     //const __server_dirname = join(__dirname, '../', __project_name, 'Server')

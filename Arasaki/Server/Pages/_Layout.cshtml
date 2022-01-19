@@ -1,3 +1,7 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@namespace Arasaki.Server.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 <!DOCTYPE html>
 <html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
@@ -62,46 +66,32 @@
     <base href="~/">
     <link rel="icon" type="image/svg" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Home to the cutting edge corner of the verse, where each and every citizen, pirate, syndicate leader and alike can learn a little more.">
   
-    <!-- PWA -->
-    <meta name="theme-color" content="#000000" />
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" sizes="192x192" href="pwa-192.png" />
-    <link rel="apple-touch-icon" sizes="512x512" href="pwa-512.png" />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://arasaki.xyz/" />
+    <meta property="og:title" content="Arasaki" />
+    <meta property="og:description" content="Home to the cutting edge corner of the verse, where each and every citizen, pirate, syndicate leader and alike can learn a little more." />
+    <meta property="og:image" content="https://arasaki.xyz/pwa-192.png" />
+  
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:url" content="https://arasaki.xyz/" />
+    <meta property="twitter:title" content="Arasaki" />
+    <meta property="twitter:description" content="Home to the cutting edge corner of the verse, where each and every citizen, pirate, syndicate leader and alike can learn a little more." />
+    <meta property="twitter:image" content="https://arasaki.xyz/pwa-192.png" />
 
     <link rel="preload" href="bundle.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
 </head>
 <body>
     <noscript>
         This website requires Javascript. If you dont have Javascript enabled, you must find out how to enable it.
         For no reason should Javascript be disabled in the modern day.
     </noscript>
-    <div id="app">
-
-    </div>
-    <script type="text/javascript" charset="UTF-8" src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
-    <script type="text/javascript" charset="UTF-8" src="_framework/blazor.webassembly.js"></script>
+    @RenderBody()
+    <script type="text/javascript" charset="UTF-8" src="_framework/blazor.server.js"></script>
     <script type="text/javascript" charset="UTF-8" src="bundle.min.js"></script>
-    <script type="text/javascript" charset="UTF-8">
-        navigator.serviceWorker.register('service-worker.js').then(reg =>
-        {
-            reg.onupdatefound = () =>
-            {
-                const installingWorker = reg.installing
-                installingWorker.onstatechange = () =>
-                {
-                    switch (installingWorker.state)
-                    {
-                        case 'installed':
-                            if (navigator.serviceWorker.controller) 
-                            {
-                                location.reload(true)
-                            }
-                            break
-                    }
-                }
-            }
-        }).catch(err => console.error('[SERVICE WORKER]', err))
-    </script>
 </body>
 </html>
