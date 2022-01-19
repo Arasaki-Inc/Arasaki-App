@@ -102,16 +102,16 @@ function needsProcessing(proc_dirname_dev, proc_dirname)
     return needsProc
 }
 
-async function minifyTypescript(item, proc_dirname, proc_dirname_dev, singular)
+async function minifyTypescript(item, proc_dirname, proc_dirname_dev, bundle)
 {
     if (needsCaching(item.path, 'ts') || needsProcessing(item.path))
     {
         try
         {
-            const output = singular ? item.path.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js') : join(proc_dirname, 'bundle.min.js')
+            const output = bundle ? join(proc_dirname, 'bundle.min.js') : item.path.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js')
             console.log('  | Minifying Typescript: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
-            execSync('npx tsc ' + (singular ? '' : '--build --force ') + item.path + ' --outFile "' + output + '"' + (singular ? '' : ' --rootDir "' + join(proc_dirname_dev + '"', 'ts')) +
-                ' --target ES2021 --lib DOM,ES2021,WebWorker --module amd --allowSyntheticDefaultImports --esModuleInterop --forceConsistentCasingInFileNames --strict --skipLibCheck', err =>
+            execSync('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'core.ts') : item.path) + ' --outFile "' + output + '" --target ES2021 --lib DOM,ES2021,WebWorker --module amd --allowSyntheticDefaultImports --esModuleInterop --forceConsistentCasingInFileNames --strict --skipLibCheck',
+                err =>
             {
                 if (err)
                 {
@@ -181,8 +181,8 @@ async function processing(proc_dirname, proc_dirname_dev)
         console.error('  | ------------------------------------------------------------------------------------------------')
     }
 
-    tsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, false))
-    swtsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, true))
+    tsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, true))
+    swtsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, false))
 
     htmlFiles.forEach(item =>
     {
