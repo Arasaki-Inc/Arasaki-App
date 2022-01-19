@@ -13,17 +13,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{AE1165D5-9EC
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		.gitmodules = .gitmodules
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bundler", "Bundler", "{CC6BCFCE-65E9-40E3-B12E-ED2C6E91485C}"
 	ProjectSection(SolutionItems) = preProject
+		Bundler\arasaki-cache.json = Bundler\arasaki-cache.json
 		Bundler\bundle_debug.cmd = Bundler\bundle_debug.cmd
 		Bundler\bundle_release.cmd = Bundler\bundle_release.cmd
 		Bundler\bundler.js = Bundler\bundler.js
 		Bundler\package-lock.json = Bundler\package-lock.json
 		Bundler\package.json = Bundler\package.json
-		Bundler\tsconfig.json = Bundler\tsconfig.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Actions", "Actions", "{96A7B529-E996-4D7A-BFBD-F9639447955D}"
