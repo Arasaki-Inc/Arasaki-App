@@ -170,7 +170,7 @@ async function processing(proc_dirname, proc_dirname_dev)
         const minCSSFilePath = proc_dirname + sep + 'bundle.min.css'
         const minMapFilePath = proc_dirname + sep + 'bundle.css.map'
         console.log('  | Minifying SASS: ' + minCSSFilePath.replace(proc_dirname, ''))
-        mkdirSync(dirname(output), { recursive: true })
+        mkdirSync(dirname(minCSSFilePath), { recursive: true })
         const result = sass.renderSync(
         {
             file: sassFile, sourceMap: true, outFile: 'bundle.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
