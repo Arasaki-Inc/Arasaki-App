@@ -232,7 +232,7 @@ async function processing(proc_dirname, proc_dirname_dev)
                     }
                     */
                     webp: {
-                        quality: 90,
+                        quality: 75,
                         target_size: 0,
                         target_PSNR: 0,
                         method: 4,
