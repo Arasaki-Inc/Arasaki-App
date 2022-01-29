@@ -111,7 +111,32 @@
             document.body.appendChild(auth)
             document.body.appendChild(wasm)
             document.body.appendChild(bundle)
+            runPWA()
             document.getElementById('transitionScript').remove()
+        }
+    </script>
+    <script type="text/javascript">
+        function runPWA() 
+        {
+            navigator.serviceWorker.register('service-worker.js').then(reg =>
+            {
+                reg.onupdatefound = () =>
+                {
+                    const installingWorker = reg.installing
+                    installingWorker.onstatechange = () =>
+                    {
+                        switch (installingWorker.state)
+                        {
+                            case 'installed':
+                                if (navigator.serviceWorker.controller) 
+                                {
+                                    location.reload(true)
+                                }
+                                break
+                        }
+                    }
+                }
+            }).catch(err => console.error('[SERVICE WORKER]', err))
         }
     </script>
 </body>
