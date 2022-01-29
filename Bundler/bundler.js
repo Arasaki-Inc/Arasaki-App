@@ -122,8 +122,8 @@ async function minifyTypescript(item, proc_dirname, proc_dirname_dev, bundle)
             const output = bundle ? join(proc_dirname, 'bundle.min.js') : item.path.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js')
             console.log('  | Minifying Typescript: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
             execSync('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'core.ts') + ' --outFile "' + output + '"' : item.path + ' --outDir ' + proc_dirname) +
-                ' --target ES2021 --lib DOM,ES2021,WebWorker --module ' + (bundle ? 'amd' : 'none') +
-                ' --esModuleInterop --allowSyntheticDefaultImports --forceConsistentCasingInFileNames --strict --skipLibCheck',
+                ' --target ES2021 --lib DOM,ES2021,WebWorker ' + (bundle ? '--module amd --esModuleInterop --allowSyntheticDefaultImports' : '') +
+                ' --forceConsistentCasingInFileNames --strict --skipLibCheck',
                 err =>
             {
                 if (err)
