@@ -24,7 +24,6 @@
     "chokidar": "^3.5.2",
     "command-exists": "^1.2.9",
     "ffmpeg-static": "^4.4.0",
-    "fs-extra": "^10.0.0",
     "get-folder-size": "^3.1.0",
     "sass": "^1.38.1",
     "squoosh": "github:GoogleChromeLabs/squoosh#dev",
