@@ -90,8 +90,10 @@
         This website requires Javascript. If you dont have Javascript enabled, you must find out how to enable it.
         For no reason should Javascript be disabled in the modern day.
     </noscript>
-    @RenderBody()
-    <script type="text/javascript" charset="UTF-8" src="_framework/blazor.server.js"></script>
-    <script type="text/javascript" charset="UTF-8" src="bundle.min.js"></script>
+    <div id="app">
+        @RenderBody()
+    </div>
+    <script type="text/javascript" src="_framework/blazor.server.js" id="blazorScript"></script>
+    <script type="text/javascript" src="bundle.min.js"></script>
 </body>
 </html>
