@@ -12,33 +12,25 @@ import { ImagePool } from '@squoosh/lib'
 import { cpus } from 'os'
 import { minify } from 'terser'
 
-// Global Variables //
-
 const __project_name = 'Arasaki'
+const __project_introduction = __project_name + ' Bundler by By Connor \'Stryxus\' Shearer.\n'
 
 const __dirname = resolve()
 const __cache_filename = join(__dirname, __project_name.toLocaleLowerCase() + '-cache.json')
 
 var isDebug
-
-//const imagePool = new ImagePool()
-
-// Global Variables //
-
-// JSON //
+var clearOnUpdate = false
 
 var cacheEntities =
 {
     cached: []
 }
 
-// JSON //
-
-function fileExists(filepath)
+function fileExists(path)
 {
     try
     {
-        accessSync(filepath, constants.R_OK | constants.W_OK)
+        accessSync(path, constants.R_OK | constants.W_OK)
         return true
     }
     catch (e)
@@ -64,64 +56,61 @@ function filterFiles(files, ext)
     return Object.values(files).filter(file => String(file.name).split('.').pop() == ext)
 }
 
-function addCacheEntry(proc_dirname_dev, proc_dirname)
-{
-    const relativeFilePath = proc_dirname_dev.replace(proc_dirname, '')
-    cacheEntities.cached = cacheEntities.cached.filter(f => f.relativeFilePath !== relativeFilePath)
-    cacheEntities.cached.push({ relativeFilePath: relativeFilePath, lastModified: statSync(proc_dirname_dev).mtime })
-    if (fileExists(__cache_filename))
-    {
-        truncateSync(__cache_filename, 0)
-    }
-    writeFileSync(__cache_filename, JSON.stringify(cacheEntities, null, "\t"), 'utf8')
-}
-
-function needsCaching(proc_dirname_dev, proc_dirname, procExt)
+function needsCaching(proc_dirname, proc_dirname_dev, itempath, outExt)
 {
     if (fileExists(__cache_filename))
     {
         cacheEntities = JSON.parse(readFileSync(__cache_filename))
     }
-    const procFilePath = proc_dirname_dev.replace(proc_dirname, proc_dirname_dev)
-    const containsEntry = cacheEntities.cached.some(file => file.relativeFilePath === proc_dirname_dev.replace(proc_dirname, ''))
-    if (!containsEntry)
+    const entryExists = cacheEntities.cached.some(file => file.path === itempath)
+    var shouldCache = true
+    if (entryExists)
     {
-        addCacheEntry(proc_dirname_dev)
+        const entry = cacheEntities.cached.filter(file => file.path === itempath)[0]
+        const outFileExists = fileExists(
+            outExt == 'min.css' ? join(proc_dirname, 'bundle.min.css') :
+                outExt == 'min.js' ? join(proc_dirname, 'bundle.min.js') :
+                    itempath.replace(proc_dirname_dev, proc_dirname).substring(0, itempath.lastIndexOf('.') - 4) + '.' + outExt)
+        shouldCache = outFileExists ? new Date(entry.lastModified).getTime() < statSync(itempath).mtime.getTime() : true
     }
-    return !(containsEntry && fileExists(procFilePath.substring(0, procFilePath.lastIndexOf('.')) + '.' + procExt))
+    if (shouldCache)
+    {
+        cacheEntities.cached = cacheEntities.cached.filter(f => f.path !== itempath)
+        cacheEntities.cached.push({ path: itempath, lastModified: statSync(itempath).mtime })
+        if (fileExists(__cache_filename))
+        {
+            truncateSync(__cache_filename, 0)
+        }
+        writeFileSync(__cache_filename, JSON.stringify(cacheEntities, null, '\t'), 'utf8')
+        updatesQueued = true
+    }
+    return shouldCache
 }
 
-function needsProcessing(proc_dirname_dev, proc_dirname)
+function runSimpleCopy(itempath, proc_dirname, proc_dirname_dev, identifier)
 {
-    const cachedFile = cacheEntities.cached.filter(file => file.relativeFilePath === proc_dirname_dev.replace(proc_dirname, ''))[0]
-    const needsProc = new Date(cachedFile.lastModified).getTime() < statSync(proc_dirname_dev).mtime.getTime()
-    if (needsProc)
-    {
-        addCacheEntry(proc_dirname_dev)
-    }
-    return needsProc
-}
-
-function runFileAction(identifier, proc_dirname, proc_dirname_dev, itempath)
-{
-    if (needsCaching(itempath, identifier.toLocaleLowerCase()) || needsProcessing(itempath))
+    if (needsCaching(proc_dirname, proc_dirname_dev, itempath, identifier))
     {
         const output = itempath.replace(proc_dirname_dev, proc_dirname)
-        console.log('  | Copying ' + identifier.toUpperCase() + ': ' + itempath.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
+        console.log('  | Copying ' + identifier.toUpperCase() + ': \\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
         mkdirSync(dirname(output), { recursive: true })
         copyFileSync(itempath, output)
     }
 }
 
-async function minifyTypescript(item, proc_dirname, proc_dirname_dev, bundle)
+var hasSASSBundleCompiled = false
+var hasTSBundleCompiled = false
+var updatesQueued = false
+
+async function minifyTypescript(itempath, proc_dirname, proc_dirname_dev, bundle)
 {
-    if (needsCaching(item.path, 'ts') || needsProcessing(item.path))
+    if (needsCaching(proc_dirname, proc_dirname_dev, itempath, 'min.js') && (!hasTSBundleCompiled || !bundle))
     {
         try
         {
-            const output = bundle ? join(proc_dirname, 'bundle.min.js') : item.path.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js')
-            console.log('  | Minifying Typescript: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
-            execSync('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'core.ts') + ' --outFile "' + output + '"' : item.path + ' --outDir ' + proc_dirname) +
+            const output = bundle ? join(proc_dirname, 'bundle.min.js') : itempath.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js')
+            console.log('  | Minifying Typescript: \\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
+            execSync('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'core.ts') + ' --outFile "' + output + '"' : itempath + ' --outDir ' + proc_dirname) +
                 ' --target ES2021 --lib DOM,ES2021,WebWorker ' + (bundle ? '--module amd --esModuleInterop --allowSyntheticDefaultImports' : '') +
                 ' --forceConsistentCasingInFileNames --strict --skipLibCheck',
                 err =>
@@ -152,61 +141,70 @@ async function minifyTypescript(item, proc_dirname, proc_dirname_dev, bundle)
 
 async function processing(proc_dirname, proc_dirname_dev)
 {
-    console.log('\\  Changes Made > Running Bundle Pass...')
+    console.log('\\   Running Bundle Pass...')
     console.log(' \\')
 
+    hasSASSBundleCompiled = false
+    hasTSBundleCompiled = false
+    updatesQueued = false
     const imagePool = new ImagePool(cpus().length)
     const files = findFiles(proc_dirname_dev)
-    const tsFiles = filterFiles(files, 'ts').filter(file => String(file.name) != 'service-worker.ts' && String(file.name) != 'service-worker.published.ts')
-    const swtsFiles = filterFiles(files, 'ts').filter(file => String(file.name) == 'service-worker.ts' || String(file.name) == 'service-worker.published.ts')
-    const sassFile = join(proc_dirname_dev, 'sass', 'bundle.sass')
-    const htmlFiles = filterFiles(files, 'html')
-    const svgFiles = filterFiles(files, 'svg')
-    const jsonFiles = filterFiles(files, 'json').filter(file => String(file.name) != 'tsconfig.json')
+    const tsFiles = filterFiles(files,    'ts')   .filter(file => String(file.name) != 'service-worker.ts' && String(file.name) != 'service-worker.published.ts')
+    const swtsFiles = filterFiles(files,  'ts')   .filter(file => String(file.name) == 'service-worker.ts' || String(file.name) == 'service-worker.published.ts')
+    const sassFile = filterFiles(files,   'sass')
+    const htmlFiles = filterFiles(files,  'html')
+    const svgFiles = filterFiles(files,   'svg')
+    const jsonFiles = filterFiles(files,  'json') .filter(file => String(file.name) != 'tsconfig.json')
     const woff2Files = filterFiles(files, 'woff2')
-    const pngFiles = filterFiles(files, 'png')
+    const pngFiles = filterFiles(files,   'png')
     const h264Files = filterFiles(files, 'mp4')
 
-    try
+    tsFiles.forEach(async item => await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, true))
+    swtsFiles.forEach(async item => await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, false))
+    sassFile.forEach(async item =>
     {
-        const minCSSFilePath = proc_dirname + sep + 'bundle.min.css'
-        const minMapFilePath = proc_dirname + sep + 'bundle.css.map'
-        console.log('  | Minifying SASS: ' + minCSSFilePath.replace(proc_dirname, ''))
-        mkdirSync(dirname(minCSSFilePath), { recursive: true })
-        const result = sass.renderSync(
+        if (needsCaching(proc_dirname, proc_dirname_dev, item.path, 'min.css') && !hasSASSBundleCompiled)
         {
-            file: sassFile, sourceMap: true, outFile: 'bundle.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
-        })
-        if (fileExists(minCSSFilePath))
-        {
-            truncateSync(minCSSFilePath, 0)
+            hasSASSBundleCompiled = true
+            try
+            {
+                const minCSSFilePath = proc_dirname + sep + 'bundle.min.css'
+                const minMapFilePath = proc_dirname + sep + 'bundle.css.map'
+                console.log('  | Minifying SASS: ' + minCSSFilePath.replace(proc_dirname, ''))
+                mkdirSync(dirname(minCSSFilePath), { recursive: true })
+                const result = sass.renderSync(
+                    {
+                        file: join(proc_dirname_dev, 'sass', 'bundle.sass'), sourceMap: true, outFile: 'bundle.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
+                    })
+                if (fileExists(minCSSFilePath))
+                {
+                    truncateSync(minCSSFilePath, 0)
+                }
+                if (fileExists(minMapFilePath))
+                {
+                    truncateSync(minMapFilePath, 0)
+                }
+                writeFileSync(minCSSFilePath, result.css.toString(), 'utf8')
+                writeFileSync(minMapFilePath, result.map.toString(), 'utf8')
+            }
+            catch (e)
+            {
+                console.error('  | ------------------------------------------------------------------------------------------------')
+                console.error('  | SASS Minification Error: ' + e)
+                console.error('  | ------------------------------------------------------------------------------------------------')
+            }
         }
-        if (fileExists(minMapFilePath))
-        {
-            truncateSync(minMapFilePath, 0)
-        }
-        writeFileSync(minCSSFilePath, result.css.toString(), 'utf8')
-        writeFileSync(minMapFilePath, result.map.toString(), 'utf8')
-    }
-    catch (e)
-    {
-        console.error('  | ------------------------------------------------------------------------------------------------')
-        console.error('  | SASS Minification Error: ' + e)
-        console.error('  | ------------------------------------------------------------------------------------------------')
-    }
-
-    tsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, true))
-    swtsFiles.forEach(async item => await minifyTypescript(item, proc_dirname, proc_dirname_dev, false))
-    htmlFiles.forEach(item => runFileAction('html', proc_dirname, proc_dirname_dev, item.path))
-    svgFiles.forEach(item => runFileAction('svg', proc_dirname, proc_dirname_dev, item.path))
-    jsonFiles.forEach(item => runFileAction('json', proc_dirname, proc_dirname_dev, item.path))
-    woff2Files.forEach(item => runFileAction('woff2', proc_dirname, proc_dirname_dev, item.path))
+    })
+    htmlFiles.forEach(item => runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'html'))
+    svgFiles.forEach(item => runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'svg'))
+    jsonFiles.forEach(item => runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'json'))
+    woff2Files.forEach(item => runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'woff2'))
     pngFiles.forEach(async item =>
     {
-        if (needsCaching(item.path, 'webp') || needsProcessing(item.path))
+        if (needsCaching(proc_dirname, proc_dirname_dev, item.path, 'webp'))
         {
             const output = item.path.replace(proc_dirname_dev, proc_dirname).replace('.png', '.webp')
-            console.log('  | Transcoding Image: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
+            console.log('  | Transcoding Image: \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
             mkdirSync(dirname(output), { recursive: true })
             if (fileExists(item.path.replace(proc_dirname_dev, proc_dirname)))
             {
@@ -274,10 +272,10 @@ async function processing(proc_dirname, proc_dirname_dev)
 
     h264Files.forEach(item =>
     {
-        if (needsCaching(item.path, 'mp4') || needsProcessing(item.path))
+        if (needsCaching(proc_dirname, proc_dirname_dev, item.path, 'mp4'))
         {
             const output = item.path.replace(proc_dirname_dev, proc_dirname)
-            console.log('  | Transcoding Video: ' + item.path.replace(proc_dirname_dev, '') + ' > ' + output.replace(proc_dirname, ''))
+            console.log(' | Transcoding Video: \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
 
             try
             {
@@ -313,28 +311,24 @@ async function processing(proc_dirname, proc_dirname_dev)
         }
     })
 
+    if (!updatesQueued) console.log('  | No files have changed!')
+    console.log(' /')
+
     const inputSize = await getFolderSize.loose(proc_dirname_dev)
     const outputSize = await getFolderSize.loose(proc_dirname)
-    console.log('  |')
-    console.log('  | > Size Before: ' + inputSize.toLocaleString('en') + ' bytes')
-    console.log('  | > Size After:  ' + outputSize.toLocaleString('en') + ' bytes')
-    console.log('  | > Efficiency: ' + (100 - (outputSize / inputSize * 100)).toFixed(4).toString() + '%')
-    console.log(' /')
+
+    console.log('| > Size Before: ' + inputSize.toLocaleString('en') + ' bytes')
+    console.log('| > Size After:  ' + outputSize.toLocaleString('en') + ' bytes')
+    console.log('| > Efficiency: ' + (100 - (outputSize / inputSize * 100)).toFixed(4).toString() + '%')
     console.log('/')
-    console.log('\n----------------------------------------------------------------------------------------------------\n')
+    if (!clearOnUpdate) console.log('\n----------------------------------------------------------------------------------------------------\n')
     await imagePool.close()
 }
 
 (async () =>
 {
     console.clear()
-    console.log('####################################################################################################')
-    console.log('##                                                                                                ##')
-    console.log('##                                        ' + __project_name + ' Bundler                                         ##')
-    console.log('##                                                                                                ##')
-    console.log('##                                  By Connor \'Stryxus\' Shearer.                                  ##')
-    console.log('##                                                                                                ##')
-    console.log('####################################################################################################\n')
+    console.log(__project_introduction)
 
     process.argv.forEach(item =>
     {
@@ -345,6 +339,9 @@ async function processing(proc_dirname, proc_dirname_dev)
                 break
             case 'build:release':
                 isDebug = false
+                break
+            case 'build:cou':
+                clearOnUpdate = true
                 break
         }
     })
@@ -361,8 +358,13 @@ async function processing(proc_dirname, proc_dirname_dev)
     //await processing(__server_wwwroot_dirname, __server_wwwrootdev_dirname)
     if (isDebug)
     {
-        chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true }).on('change', async path =>
+        chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true }).on('change', async () =>
         {
+            if (clearOnUpdate)
+            {
+                console.clear()
+                console.log(__project_introduction)
+            }
             await processing(__client_wwwroot_dirname, __client_wwwrootdev_dirname)
         });
     }

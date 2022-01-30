@@ -1,1 +1,1 @@
-npm run build:debug
+npm run build:debug build:cou
