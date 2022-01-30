@@ -106,11 +106,12 @@ async function minifyTypescript(itempath, proc_dirname, proc_dirname_dev, bundle
 {
     if (needsCaching(proc_dirname, proc_dirname_dev, itempath, 'min.js') && (!hasTSBundleCompiled || !bundle))
     {
+        hasTSBundleCompiled = bundle
         try
         {
             const output = bundle ? join(proc_dirname, 'bundle.min.js') : itempath.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js')
-            console.log('  | Minifying Typescript: \\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
-            execSync('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'core.ts') + ' --outFile "' + output + '"' : itempath + ' --outDir ' + proc_dirname) +
+            console.log('  | Minifying Typescript: ' + (bundle ? '\\wwwroot\\bundle.min.js - \\wwwroot\\bundle.js.map' : '\\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, '')))
+            execSync('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'bundle.ts') + ' --outFile "' + output + '"' : itempath + ' --outDir ' + proc_dirname) +
                 ' --target ES2021 --lib DOM,ES2021,WebWorker ' + (bundle ? '--module amd --esModuleInterop --allowSyntheticDefaultImports' : '') +
                 ' --forceConsistentCasingInFileNames --strict --skipLibCheck',
                 err =>
@@ -170,7 +171,7 @@ async function processing(proc_dirname, proc_dirname_dev)
             {
                 const minCSSFilePath = proc_dirname + sep + 'bundle.min.css'
                 const minMapFilePath = proc_dirname + sep + 'bundle.css.map'
-                console.log('  | Minifying SASS: ' + minCSSFilePath.replace(proc_dirname, ''))
+                console.log('  | Minifying SASS: \\wwwroot\\bundle.min.css - \\wwwroot\\bundle.css.map')
                 mkdirSync(dirname(minCSSFilePath), { recursive: true })
                 const result = sass.renderSync(
                     {
@@ -212,7 +213,7 @@ async function processing(proc_dirname, proc_dirname_dev)
             }
             try
             {
-                const image = imagePool.ingestImage(item.path)
+                const image = imagePool.ingestImage(readFileSync(item.path))
                 await image.decoded
                 await image.encode({
                     // Use AVIF as soon as the memory and path bugs are fixed
@@ -231,7 +232,8 @@ async function processing(proc_dirname, proc_dirname_dev)
                         tune: 0
                     }
                     */
-                    webp: {
+                    webp:
+                    {
                         quality: 75,
                         target_size: 0,
                         target_PSNR: 0,
