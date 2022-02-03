@@ -1,9 +1,14 @@
 interface Window 
 {
-    runtime: any;
+    runtime: any
 }
 
-var GLOBAL: any
+class GLOBAL
+{
+    static JSRuntime: any
+    static runtime: any
+}
+
 GLOBAL.JSRuntime = null
 GLOBAL.runtime = (ref: any) => { if (GLOBAL.JSRuntime === null) GLOBAL.JSRuntime = ref }
 (() =>
