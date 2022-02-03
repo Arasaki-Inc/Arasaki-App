@@ -1,0 +1,12 @@
+﻿<img id="background" src="@UIState.CurrentPageContext.BackgroundRelativeURL" alt="Background" />
+
+@inject UIState UIState
+
+@code 
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        UIState.PageContextHasChanged += () => InvokeAsync(() => StateHasChanged());
+    }
+}

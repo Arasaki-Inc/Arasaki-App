@@ -1,0 +1,126 @@
+﻿<div id="navigationBar" class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <NavLink class="@(IsSpecialActive ? "row active" : "row")" href="/uefi" @onclick='() => CurrentSelected = "/uefi"' Match="NavLinkMatch.All">
+                <div class="col">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <img src="/favicon.svg" alt="Logo" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4>Arasaki UEFI</h4>
+                        </div>
+                    </div>
+                </div>
+            </NavLink>
+            <hr />
+            <NavLink class="row" href="/uefi/settings" @onclick='() => CurrentSelected = "/uefi/settings"' Match="NavLinkMatch.All">
+                <div class="col">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4>App Settings</h4>
+                        </div>
+                    </div>
+                </div>
+            </NavLink>
+            <hr />
+            <NavLink class="row" href="/uefi/perms" @onclick='() => CurrentSelected = "/uefi/perms"' Match="NavLinkMatch.All">
+                <div class="col">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4>Permissions</h4>
+                        </div>
+                    </div>
+                </div>
+            </NavLink>
+            <hr />
+            <NavLink class="row" href="/uefi/storage" @onclick='() => CurrentSelected = "/uefi/storage"' Match="NavLinkMatch.All">
+                <div class="col">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <i class="fas fa-hdd"></i>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4>Storage</h4>
+                        </div>
+                    </div>
+                </div>
+            </NavLink>
+            <hr />
+            <NavLink class="row" href="/uefi/updater" @onclick='() => CurrentSelected = "/uefi/updater"' Match="NavLinkMatch.All">
+                <div class="col">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4>Arasaki Update</h4>
+                        </div>
+                    </div>
+                </div>
+            </NavLink>
+            <hr />
+            <NavLink class="row" href="/uefi/about" @onclick='() => CurrentSelected = "/uefi/about"' Match="NavLinkMatch.All">
+                <div class="col">
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <i class="fas fa-info"></i>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4>About Arasaki</h4>
+                        </div>
+                    </div>
+                </div>
+            </NavLink>
+        </div>
+    </div>
+</div>
+
+@inject NavigationManager NavigationManager
+@inject UIState UIState
+
+@code 
+{
+    private bool IsSpecialActive = false;
+    private string CurrentSelected = "/uefi";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Uri navURI = new(NavigationManager.Uri);
+        if (UIState.CurrentPageContext.RelativeURLs[0] == "/uefi")
+        {
+            IsSpecialActive = true;
+            StateHasChanged();
+        }
+        UIState.PageContextHasChanged += () =>
+        {
+            IsSpecialActive = UIState.CurrentPageContext.RelativeURLs[0] == "/uefi";
+            InvokeAsync(() => StateHasChanged());
+        };
+        NavigationManager.LocationChanged += (object e, LocationChangedEventArgs args) =>
+        {
+            PageContext newConext = UIState.PageContexts.First(x => x.RelativeURLs.Contains(CurrentSelected));
+            if (!UIState.CurrentPageContext.Equals(newConext)) UIState.CurrentPageContext = newConext;
+            IsSpecialActive = false;
+        };
+    }
+}

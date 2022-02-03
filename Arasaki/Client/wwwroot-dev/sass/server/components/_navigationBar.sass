@@ -1,0 +1,43 @@
+#navigationBar
+    position: fixed
+    top: 50%
+    left: 0px
+    width: #{$navigationBarWidth}px
+    transform: translateY(-50%)
+    backdrop-filter: $backdropBlurHigh
+    clip-path: polygon(0px 0px, calc(100% - #{$cornerClipSizeLarge}px) 0px, 100% #{$cornerClipSizeLarge}px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
+    color: black
+    z-index: $zIndexNavigationBar
+    & > .row > .col > .row
+        padding: 20px 0px
+        cursor: pointer
+        background-color: rgba($themeRedNormal, 0.4)
+        color: black
+        text-decoration: none
+        &.active
+            background-color: rgba($themeRedDarkest, 0.4)
+            color: white
+            border-right: 4px solid rgba($themeRedNormal, 0.4)
+            img
+                filter: brightness(0%) invert(100%)
+        &:hover
+            background-color: rgba(0, 0, 0, 0.4)
+            color: white
+            border-right: 4px solid rgba($themeRedNormal, 0.4)
+            img
+                filter: brightness(0%) invert(100%)
+        img
+            width: 4vw
+            filter: brightness(0%)
+        i
+            font-size: 2.5vw
+        h4
+            text-align: center
+            margin-bottom: 0px
+    hr
+        background-color: black
+        border-top: 1px solid black
+        border-bottom: 1px solid black
+        border-left: none
+        border-right: none
+        margin: 0px

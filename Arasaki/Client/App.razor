@@ -23,3 +23,14 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@inject NavigationManager NavigationManager
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Uri navURI = new(NavigationManager.Uri);
+    }
+}

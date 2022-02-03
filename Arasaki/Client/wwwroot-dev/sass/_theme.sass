@@ -1,9 +1,11 @@
 * 
     user-select: none
+    outline: none
+html
+    background-color: black
 html, body
     margin: 0px
     padding: 0px
-    background-color: black
     color: white
     overflow-x: hidden
     width: 100vw
@@ -11,3 +13,26 @@ html, body
 ::-webkit-scrollbar 
     display: none
     width: 0px
+#background
+    position: fixed
+    z-index: $zIndexBackground
+    top: 0px
+    bottom: 0px
+    right: 0px
+    height: 100vh
+h1
+    font-size: 36px
+h2
+    font-size: 32px
+h3
+    font-size: 28px
+h4
+    font-size: 24px
+h5
+    font-size: 20px
+p
+    font-size: 16px
+small
+    font-size: 12px
+p, small
+    letter-spacing: 1px

@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Star-Aether/Core.git"
+    "url": "git+https://github.com/Arasaki-Inc/Arasaki-App.git"
   },
   "author": "Connor 'Stryxus' Shearer",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Star-Aether/Core/issues"
+    "url": "https://github.com/Arasaki-Inc/Arasaki-Appissues"
   },
-  "homepage": "https://github.com/Star-Aether/Core#readme",
+  "homepage": "https://github.com/Arasaki-Inc/Arasaki-Appe#readme",
   "dependencies": {
     "@squoosh/lib": "^0.4.0",
     "chokidar": "^3.5.2",

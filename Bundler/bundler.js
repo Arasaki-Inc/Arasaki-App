@@ -112,7 +112,7 @@ async function minifyTypescript(itempath, proc_dirname, proc_dirname_dev, bundle
             const output = bundle ? join(proc_dirname, 'bundle.min.js') : itempath.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js')
             console.log('  | Minifying Typescript: ' + (bundle ? '\\wwwroot\\bundle.min.js - \\wwwroot\\bundle.js.map' : '\\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, '')))
             execSync('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'bundle.ts') + ' --outFile "' + output + '"' : itempath + ' --outDir ' + proc_dirname) +
-                ' --target ES2021 --lib DOM,ES2021,WebWorker ' + (bundle ? '--module ES2020 --esModuleInterop --allowSyntheticDefaultImports' : '') +
+                ' --target ES2021 --lib DOM,ES2021' + (bundle ? ' --module none --esModuleInterop --allowSyntheticDefaultImports' : ',WebWorker') +
                 ' --forceConsistentCasingInFileNames --strict --skipLibCheck',
                 err =>
             {

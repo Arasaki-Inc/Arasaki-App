@@ -8,6 +8,8 @@ using Microsoft.Identity.Web;
 
 using Serilog;
 
+using Arasaki.Server.Data.States;
+
 Logger.Initialise(new LoggerConfiguration().WriteTo.Console(outputTemplate: Logger.DefaultLogFormat).CreateLogger());
 
 WebApplicationBuilder builder;
@@ -31,6 +33,8 @@ builder.Services.AddResponseCompression(options =>
     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "image/svg+xml" });
 });
 builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.SmallestSize);
+
+builder.Services.AddSingleton<UIState>();
 
 WebApplication app = builder.Build();
 Services.SetServiceProvider(app.Services.CreateScope().ServiceProvider);
