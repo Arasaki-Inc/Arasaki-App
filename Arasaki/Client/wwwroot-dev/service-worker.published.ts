@@ -1,6 +1,9 @@
 /// <reference lib="webworker" />
 
-declare const self: any;
+interface Window 
+{
+    assetsManifest: any
+}
 
 self.importScripts('./service-worker-assets.js')
 self.addEventListener('install', (event: any) => event.waitUntil(onInstall(event)))
@@ -12,7 +15,7 @@ const cacheName = `${cacheNamePrefix}${self.assetsManifest.version}`
 const offlineAssetsInclude = [ /\.dll$/, /\.pdb$/, /\.wasm/, /\.html/, /\.js$/, /\.json$/, /\.css$/, /\.woff2$/, /\.blat$/, /\.dat$/, /\.webp$/, /\.avif$/, /\.aac$/ ]
 const offlineAssetsExclude = [ /^service-worker\.js$/ ]
 
-export async function onInstall(event: any)
+async function onInstall(event: any)
 {
     console.info('Arasaki: Installing...')
     const assetsRequests = self.assetsManifest.assets
@@ -23,7 +26,7 @@ export async function onInstall(event: any)
     console.info('Arasaki: Installation Complete')
 }
 
-export async function onActivate(event: any)
+async function onActivate(event: any)
 {
     console.info('Arasaki: Activating...')
     const cacheKeys = await caches.keys()
@@ -33,7 +36,7 @@ export async function onActivate(event: any)
     console.info('Arasaki: Activated')
 }
 
-export async function onFetch(event: any)
+async function onFetch(event: any)
 {
     let cachedResponse;
     if (event.request.method === 'GET') 
