@@ -101,22 +101,8 @@
     </div>
     <script type="text/javascript" src="_framework/blazor.server.js" id="blazorScript"></script>
     <script type="text/javascript">
-        function setupAssembly() 
+        function runPWA() 
         {
-            let server = document.getElementById('blazorScript')
-            server.parentNode.removeChild(server)
-            let auth =    document.createElement('script')
-            let wasm =    document.createElement('script')
-            let bundle =  document.createElement('script')
-            auth.type =   'text/javascript'
-            wasm.type =   'text/javascript'
-            bundle.type = 'text/javascript'
-            auth.src =    '_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js'
-            wasm.src =    '_framework/blazor.webassembly.js'
-            bundle.src =  'bundle.min.js'
-            document.body.appendChild(auth)
-            document.body.appendChild(wasm)
-            document.body.appendChild(bundle)
             navigator.serviceWorker.register('service-worker.js').then(reg =>
             {
                 reg.onupdatefound = () =>
@@ -136,6 +122,26 @@
                     }
                 }
             }).catch(err => console.error('[SERVICE WORKER]', err))
+        }
+    </script>
+    <script type="text/javascript" id="transitionScript">
+        function setupAssembly() 
+        {
+            let server = document.getElementById('blazorScript')
+            server.parentNode.removeChild(server)
+            let auth =    document.createElement('script')
+            let wasm =    document.createElement('script')
+            let bundle =  document.createElement('script')
+            auth.type =   'text/javascript'
+            wasm.type =   'text/javascript'
+            bundle.type = 'text/javascript'
+            auth.src =    '_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js'
+            wasm.src =    '_framework/blazor.webassembly.js'
+            bundle.src =  'bundle.min.js'
+            document.body.appendChild(auth)
+            document.body.appendChild(wasm)
+            document.body.appendChild(bundle)
+            runPWA()
         }
     </script>
 </body>
