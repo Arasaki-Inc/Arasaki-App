@@ -100,7 +100,7 @@
         @RenderBody()
     </div>
     <script type="text/javascript" src="_framework/blazor.server.js" id="blazorScript"></script>
-    <script type="text/javascript" id="transitionScript">
+    <script type="text/javascript">
         function setupAssembly() 
         {
             let server = document.getElementById('blazorScript')
@@ -117,13 +117,6 @@
             document.body.appendChild(auth)
             document.body.appendChild(wasm)
             document.body.appendChild(bundle)
-            runPWA()
-            document.getElementById('transitionScript').remove()
-        }
-    </script>
-    <script type="text/javascript">
-        function runPWA() 
-        {
             navigator.serviceWorker.register('service-worker.js').then(reg =>
             {
                 reg.onupdatefound = () =>
