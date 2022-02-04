@@ -1,7 +1,7 @@
 import { join, resolve, dirname, sep } from 'path'
-import { constants, readFileSync, writeFileSync, statSync, accessSync, truncateSync, unlinkSync, readdirSync, mkdirSync, copyFileSync } from 'fs'
-import { execSync } from 'child_process'
+import { statSync, truncate, unlinkSync, readdirSync, readFile } from 'fs'
 import process from 'process'
+import util from 'util'
 
 import chokidar from 'chokidar'
 import getFolderSize from 'get-folder-size'
@@ -11,6 +11,10 @@ import commandExistsSync from 'command-exists'
 import { ImagePool } from '@squoosh/lib'
 import { cpus } from 'os'
 import { minify } from 'terser'
+import fs from 'fs-extra'
+import exec from 'await-exec'
+
+var readFilePromise = util.promisify(readFile);
 
 const __project_name = 'Arasaki'
 const __project_introduction = __project_name + ' Bundler by By Connor \'Stryxus\' Shearer.\n'
@@ -24,19 +28,6 @@ var clearOnUpdate = false
 var cacheEntities =
 {
     cached: []
-}
-
-function fileExists(path)
-{
-    try
-    {
-        accessSync(path, constants.R_OK | constants.W_OK)
-        return true
-    }
-    catch (e)
-    {
-        return false
-    }
 }
 
 function findFiles(path)
@@ -56,45 +47,49 @@ function filterFiles(files, ext)
     return Object.values(files).filter(file => String(file.name).split('.').pop() == ext)
 }
 
-function needsCaching(proc_dirname, proc_dirname_dev, itempath, outExt)
+async function needsCaching(proc_dirname, proc_dirname_dev, itempath, outExt)
 {
-    if (fileExists(__cache_filename))
+    var cacheFileExists = await fs.ensureFile(__cache_filename, err => { if (err) { console.error(err) } })
+    if (cacheFileExists)
     {
-        cacheEntities = JSON.parse(readFileSync(__cache_filename))
+        cacheEntities = await readFilePromise(__cache_filename, 'utf-8').then(data =>
+        {
+            return JSON.parse(data)
+        }).catch(e =>
+        {
+            console.log("Error reading file", e)
+        })
     }
     const entryExists = cacheEntities.cached.some(file => file.path === itempath)
     var shouldCache = true
     if (entryExists)
     {
         const entry = cacheEntities.cached.filter(file => file.path === itempath)[0]
-        const outFileExists = fileExists(
+        const outFileExists = await fs.ensureFile(
             outExt == 'min.css' ? join(proc_dirname, 'bundle.min.css') :
                 outExt == 'min.js' ? join(proc_dirname, 'bundle.min.js') :
-                    itempath.replace(proc_dirname_dev, proc_dirname).substring(0, itempath.lastIndexOf('.') - 4) + '.' + outExt)
+                    itempath.replace(proc_dirname_dev, proc_dirname).substring(0, itempath.lastIndexOf('.') - 4) + '.' + outExt, err => { if (err) { console.error(err) } })
         shouldCache = outFileExists ? new Date(entry.lastModified).getTime() < statSync(itempath).mtime.getTime() : true
     }
     if (shouldCache)
     {
         cacheEntities.cached = cacheEntities.cached.filter(f => f.path !== itempath)
         cacheEntities.cached.push({ path: itempath, lastModified: statSync(itempath).mtime })
-        if (fileExists(__cache_filename))
-        {
-            truncateSync(__cache_filename, 0)
-        }
-        writeFileSync(__cache_filename, JSON.stringify(cacheEntities, null, '\t'), 'utf8')
+        if (await fs.ensureFile(__cache_filename, err => { if (err) { console.error(err) } })) { await truncate(__cache_filename, 0, err => { if (err) { console.error(err) } }) }
+        await fs.outputFile(__cache_filename, JSON.stringify(cacheEntities, null, '\t'), err => { if (err) { console.error(err) } })
         updatesQueued = true
     }
     return shouldCache
 }
 
-function runSimpleCopy(itempath, proc_dirname, proc_dirname_dev, identifier)
+async function runSimpleCopy(itempath, proc_dirname, proc_dirname_dev, identifier)
 {
-    if (needsCaching(proc_dirname, proc_dirname_dev, itempath, identifier))
+    if (await needsCaching(proc_dirname, proc_dirname_dev, itempath, identifier))
     {
         const output = itempath.replace(proc_dirname_dev, proc_dirname)
         console.log('  | Copying ' + identifier.toUpperCase() + ': \\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
-        mkdirSync(dirname(output), { recursive: true })
-        copyFileSync(itempath, output)
+        await fs.ensureDir(dirname(output), err => { if (err) { console.error(err) } })
+        await fs.copy(itempath, output, err => { if (err) { console.error(err) } })
     }
 }
 
@@ -104,32 +99,34 @@ var updatesQueued = false
 
 async function minifyTypescript(itempath, proc_dirname, proc_dirname_dev, bundle)
 {
-    if (needsCaching(proc_dirname, proc_dirname_dev, itempath, 'min.js') && (!hasTSBundleCompiled || !bundle))
+    if (await needsCaching(proc_dirname, proc_dirname_dev, itempath, 'min.js') && (!hasTSBundleCompiled || !bundle))
     {
         hasTSBundleCompiled = bundle
         try
         {
             const output = bundle ? join(proc_dirname, 'bundle.min.js') : itempath.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js')
             console.log('  | Minifying Typescript: ' + (bundle ? '\\wwwroot\\bundle.min.js - \\wwwroot\\bundle.js.map' : '\\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, '')))
-            execSync('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'bundle.ts') + ' --outFile "' + output + '"' : itempath + ' --outDir ' + proc_dirname) +
+            await exec('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'bundle.ts') + ' --outFile "' + output + '"' : itempath + ' --outDir ' + proc_dirname) +
                 ' --target ES2021 --lib DOM,ES2021' + (bundle ? ' --module none --esModuleInterop --allowSyntheticDefaultImports' : ',WebWorker') +
                 ' --forceConsistentCasingInFileNames --strict --skipLibCheck',
-                err =>
-            {
-                if (err)
+                (error, stdout, stderr) =>
                 {
-                    throw err
-                }
-            })
-            const result = await minify(readFileSync(output, 'utf8'), { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: true })
-            truncateSync(output)
-            const mapFilename = output.replace('.js', '.js.map')
-            if (fileExists(mapFilename))
+                    if (error) { console.log(`  | [ERROR] Typescript CLI: ${error.message}`) }
+                    else if (stderr) { console.log(` | [ERROR] Typescript CLI: ${stderr}`) }
+                    else { console.log(`  | [INFO] Typescript CLI: ${stdout}`) }
+                })
+            const result = await minify(await readFilePromise(output, 'utf-8').then(data =>
             {
-                truncateSync(mapFilename)
-            }
-            writeFileSync(output, result.code, 'utf8')
-            writeFileSync(mapFilename, result.map, 'utf8')
+                return data
+            }).catch(e =>
+            {
+                console.log("Error reading file", e)
+            }), { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: true })
+            await truncate(output, 0, err => { if (err) { console.error(err) } })
+            const mapFilename = output.replace('.js', '.js.map')
+            if (await fs.ensureFile(mapFilename, err => { if (err) { console.error(err) } })) { await truncate(mapFilename, 0, err => { if (err) { console.error(err) } }) }
+            await fs.outputFile(output, result.code, err => { if (err) { console.error(err) } })
+            await fs.outputFile(mapFilename, result.map, err => { if (err) { console.error(err) } })
         }
         catch (e)
         {
@@ -160,11 +157,11 @@ async function processing(proc_dirname, proc_dirname_dev)
     const pngFiles = filterFiles(files,   'png')
     const h264Files = filterFiles(files, 'mp4')
 
-    tsFiles.forEach(async item => await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, true))
-    swtsFiles.forEach(async item => await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, false))
-    sassFile.forEach(async item =>
+    await Promise.all(tsFiles.map(async item => { await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, true) }))
+    await Promise.all(swtsFiles.map(async item => { await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, false) }))
+    await Promise.all(sassFile.map(async item =>
     {
-        if (needsCaching(proc_dirname, proc_dirname_dev, item.path, 'min.css') && !hasSASSBundleCompiled)
+        if (await needsCaching(proc_dirname, proc_dirname_dev, item.path, 'min.css') && !hasSASSBundleCompiled)
         {
             hasSASSBundleCompiled = true
             try
@@ -172,21 +169,15 @@ async function processing(proc_dirname, proc_dirname_dev)
                 const minCSSFilePath = proc_dirname + sep + 'bundle.min.css'
                 const minMapFilePath = proc_dirname + sep + 'bundle.css.map'
                 console.log('  | Minifying SASS: \\wwwroot\\bundle.min.css - \\wwwroot\\bundle.css.map')
-                mkdirSync(dirname(minCSSFilePath), { recursive: true })
+                await fs.ensureDir(dirname(minCSSFilePath), err => { if (err) { console.error(err) } })
                 const result = sass.renderSync(
                     {
                         file: join(proc_dirname_dev, 'sass', 'bundle.sass'), sourceMap: true, outFile: 'bundle.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
                     })
-                if (fileExists(minCSSFilePath))
-                {
-                    truncateSync(minCSSFilePath, 0)
-                }
-                if (fileExists(minMapFilePath))
-                {
-                    truncateSync(minMapFilePath, 0)
-                }
-                writeFileSync(minCSSFilePath, result.css.toString(), 'utf8')
-                writeFileSync(minMapFilePath, result.map.toString(), 'utf8')
+                if (await fs.ensureFile(minCSSFilePath), err => { if (err) { console.error(err) } }) { await truncate(minCSSFilePath, 0, err => { if (err) { console.error(err) } }) }
+                if (await fs.ensureFile(minMapFilePath), err => { if (err) { console.error(err) } }) { await truncate(minMapFilePath, 0, err => { if (err) { console.error(err) } }) }
+                await fs.outputFile(minCSSFilePath, result.css.toString(), err => { if (err) { console.error(err) } })
+                await fs.outputFile(minMapFilePath, result.map.toString(), err => { if (err) { console.error(err) } })
             }
             catch (e)
             {
@@ -195,25 +186,31 @@ async function processing(proc_dirname, proc_dirname_dev)
                 console.error('  | ------------------------------------------------------------------------------------------------')
             }
         }
-    })
-    htmlFiles.forEach(item => runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'html'))
-    svgFiles.forEach(item => runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'svg'))
-    jsonFiles.forEach(item => runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'json'))
-    woff2Files.forEach(item => runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'woff2'))
-    pngFiles.forEach(async item =>
+    }))
+    await Promise.all(htmlFiles.map(async item => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'html')))
+    await Promise.all(svgFiles.map(async item => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'svg')))
+    await Promise.all(jsonFiles.map(async item => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'json')))
+    await Promise.all(woff2Files.map(async item => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'woff2')))
+    await Promise.all(pngFiles.map(async item =>
     {
-        if (needsCaching(proc_dirname, proc_dirname_dev, item.path, 'webp'))
+        if (await needsCaching(proc_dirname, proc_dirname_dev, item.path, 'webp'))
         {
             const output = item.path.replace(proc_dirname_dev, proc_dirname).replace('.png', '.webp')
             console.log('  | Transcoding Image: \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
-            mkdirSync(dirname(output), { recursive: true })
-            if (fileExists(item.path.replace(proc_dirname_dev, proc_dirname)))
+            await fs.ensureDir(dirname(output), err => { if (err) { console.error(err) } })
+            if (await fs.ensureFile(item.path.replace(proc_dirname_dev, proc_dirname), err => { if (err) { console.error(err) } }))
             {
                 unlinkSync(item.path.replace(proc_dirname_dev, proc_dirname))
             }
             try
             {
-                const image = imagePool.ingestImage(readFileSync(item.path))
+                const image = imagePool.ingestImage(await readFilePromise(item.path).then(data =>
+                {
+                    return data
+                }).catch(e =>
+                {
+                    console.log("Error reading file", e)
+                }))
                 await image.decoded
                 await image.encode({
                     // Use AVIF as soon as the memory and path bugs are fixed
@@ -237,21 +234,21 @@ async function processing(proc_dirname, proc_dirname_dev)
                         quality: 75,
                         target_size: 0,
                         target_PSNR: 0,
-                        method: 4,
+                        method: 6,
                         sns_strength: 100,
                         filter_strength: 100,
                         filter_sharpness: 0,
                         filter_type: 1,
                         partitions: 0,
                         segments: 4,
-                        pass: 1,
+                        pass: 10,
                         show_compressed: 0,
                         preprocessing: 0,
                         autofilter: 0,
                         partition_limit: 0,
                         alpha_compression: 1,
                         alpha_filtering: 1,
-                        alpha_quality: 100,
+                        alpha_quality: 75,
                         lossless: 0,
                         exact: 0,
                         image_hint: 0,
@@ -263,44 +260,45 @@ async function processing(proc_dirname, proc_dirname_dev)
                         use_sharp_yuv: 0
                     },
                 })
-                writeFileSync(output, (await image.encodedWith.webp).binary)
+                const data = (await image.encodedWith.webp).binary
+                await fs.outputFile(output, data, err => { if (err) { console.error(err) } })
             }
             catch (e)
             {
                 console.error(e)
             }
         }
-    })
-
-    h264Files.forEach(item =>
+    }))
+    await Promise.all(h264Files.map(async item =>
     {
-        if (needsCaching(proc_dirname, proc_dirname_dev, item.path, 'mp4'))
+        if (await needsCaching(proc_dirname, proc_dirname_dev, item.path, 'mp4'))
         {
             const output = item.path.replace(proc_dirname_dev, proc_dirname)
             console.log(' | Transcoding Video: \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
 
             try
             {
-                mkdirSync(dirname(output), { recursive: true })
+                await fs.ensureDir(dirname(output), err => { if (err) { console.error(err) } })
                 if (commandExistsSync('ffmpeg'))
                 {
-                    execSync('start cmd /C ffmpeg -y -i ' + item.path + (isDebug ? ' -c:v librav1e -rav1e-params speed=10:low_latency=true' : ' -c:v librav1e -b:v 200K -rav1e-params speed=0:low_latency=true') + ' -movflags +faststart -c:a libopus -q:a 128 ' + output, err =>
+                    await exec('start cmd /C ffmpeg -y -i ' + item.path + (isDebug ? ' -c:v librav1e -rav1e-params speed=10:low_latency=true' : ' -c:v librav1e -b:v 200K -rav1e-params speed=0:low_latency=true') +
+                        ' -movflags +faststart -c:a libopus -q:a 128 ' + output,
+                        (error, stdout, stderr) =>
                     {
-                        if (err)
-                        {
-                            throw err
-                        }
+                            if (error) { console.log(`  | [ERROR] FFMpeg CLI: ${error.message}`) }
+                            else if (stderr) { console.log(` | [ERROR] FFMpeg CLI: ${stderr}`) }
+                            else { console.log(`  | [INFO] FFMpeg CLI: ${stdout}`) }
                     })
                 }
                 else
                 {
                     console.error('No non-GPL compliant FFmpeg build detected in enviroment variables - falling back to libaom, video transcoding will take substantially longer and will be much lower quality!')
-                    execSync('start cmd /C ' + ffmpeg + ' -y -i ' + item.path + ' -c:v libaom-av1 ' + (isDebug ? '-crf 52' : '-crf 30 -b:v 200k') + ' -movflags +faststart -c:a libopus -q:a 128 ' + output, err =>
+                    await exec('start cmd /C ' + ffmpeg + ' -y -i ' + item.path + ' -c:v libaom-av1 ' + (isDebug ? '-crf 52' : '-crf 30 -b:v 200k') + ' -movflags +faststart -c:a libopus -q:a 128 ' + output,
+                        (error, stdout, stderr) =>
                     {
-                        if (err)
-                        {
-                            throw err
-                        }
+                        if (error) { console.log(`  | [ERROR] FFMpeg CLI: ${error.message}`) }
+                        else if (stderr) { console.log(` | [ERROR] FFMpeg CLI: ${stderr}`) }
+                        else { console.log(`  | [INFO] FFMpeg CLI: ${stdout}`) }
                     })
                 }
             }
@@ -311,7 +309,7 @@ async function processing(proc_dirname, proc_dirname_dev)
                 console.error('  | ------------------------------------------------------------------------------------------------')
             }
         }
-    })
+    }))
 
     if (!updatesQueued) console.log('  | No files have changed!')
     console.log(' /')
