@@ -1,5 +1,5 @@
 import { join, resolve, dirname, sep } from 'path'
-import fss from 'fs'
+import fss, { readFile, writeFile } from 'fs'
 import fs from 'fs/promises'
 import process from 'process'
 import { cpus } from 'os'
@@ -13,6 +13,7 @@ import { ImagePool } from '@squoosh/lib'
 import { minify } from 'terser'
 import exec from 'await-exec'
 import pLimit from 'p-limit'
+import ttf2woff2 from 'ttf2woff2'
 
 const limit = pLimit(1);
 
@@ -76,7 +77,7 @@ async function runSimpleCopy(itempath, proc_dirname, proc_dirname_dev, identifie
     if (await needsCaching(proc_dirname, proc_dirname_dev, itempath, identifier))
     {
         const output = itempath.replace(proc_dirname_dev, proc_dirname)
-        console.log('  | Copying ' + identifier.toUpperCase() + ': \\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
+        console.log('  | Copying:              [' + identifier.toUpperCase() + '] \\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
         await fs.mkdir(dirname(output), { recursive: true }, err => { if (err) console.error(err) })
         await fs.copyFile(itempath, output).catch((error) => console.log(error))
     }
@@ -107,7 +108,7 @@ async function minifyTypescript(itempath, proc_dirname, proc_dirname_dev, bundle
             const result = await minify(await fs.readFile(output, 'utf-8').then(data => data).catch(err => console.error(err)), { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: true })
             await fs.truncate(output, 0, err => { if (err) console.error(err) })
             const mapFilename = output.replace('.js', '.js.map')
-            if (await fileExists(mapFilename, err => { if (err) console.error(err) })) { await fs.truncate(mapFilename, 0, err => { if (err) console.error(err) }) }
+            if (await fileExists(mapFilename)) { await fs.truncate(mapFilename, 0, err => { if (err) console.error(err) }) }
             await fs.writeFile(output, result.code, err => { if (err) console.error(err) })
             await fs.writeFile(mapFilename, result.map, err => { if (err) console.error(err) })
         }
@@ -130,15 +131,16 @@ async function processing(proc_dirname, proc_dirname_dev)
     updatesQueued = false
     const imagePool = new ImagePool(cpus().length)
     const files = await findFiles(proc_dirname_dev)
-    const tsFiles = filterFiles(files,    'ts')   .filter(file => String(file.name) != 'service-worker.ts' && String(file.name) != 'service-worker.published.ts')
-    const swtsFiles = filterFiles(files,  'ts')   .filter(file => String(file.name) == 'service-worker.ts' || String(file.name) == 'service-worker.published.ts')
+    const tsFiles = filterFiles(files,    'ts')    .filter(file => String(file.name) != 'service-worker.ts' && String(file.name) != 'service-worker.published.ts')
+    const swtsFiles = filterFiles(files,  'ts')    .filter(file => String(file.name) == 'service-worker.ts' || String(file.name) == 'service-worker.published.ts')
     const sassFile = filterFiles(files,   'sass')
     const htmlFiles = filterFiles(files,  'html')
     const svgFiles = filterFiles(files,   'svg')
-    const jsonFiles = filterFiles(files,  'json') .filter(file => String(file.name) != 'tsconfig.json')
+    const jsonFiles = filterFiles(files,  'json')  .filter(file => String(file.name) != 'tsconfig.json')
+    const ttfFiles = filterFiles(files,   'ttf')
     const woff2Files = filterFiles(files, 'woff2')
     const pngFiles = filterFiles(files,   'png')
-    const h264Files = filterFiles(files, 'mp4')
+    const h264Files = filterFiles(files,  'mp4')
 
     await Promise.all(tsFiles.map(item => limit(async () => await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, true))))
     await Promise.all(swtsFiles.map(item => limit(async () => await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, false))))
@@ -151,14 +153,14 @@ async function processing(proc_dirname, proc_dirname_dev)
             {
                 const minCSSFilePath = proc_dirname + sep + 'bundle.min.css'
                 const minMapFilePath = proc_dirname + sep + 'bundle.css.map'
-                console.log('  | Minifying SASS: \\wwwroot\\bundle.min.css - \\wwwroot\\bundle.css.map')
+                console.log('  | Minifying SASS:       \\wwwroot\\bundle.min.css - \\wwwroot\\bundle.css.map')
                 await fs.mkdir(dirname(minCSSFilePath), { recursive: true }, err => { if (err) console.error(err) })
                 const result = sass.renderSync(
                     {
                         file: join(proc_dirname_dev, 'sass', 'bundle.sass'), sourceMap: true, outFile: 'bundle.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
                     })
-                if (await fileExists(minCSSFilePath), err => { if (err) console.error(err) }) { await fs.truncate(minCSSFilePath, 0, err => { if (err) console.error(err) }) }
-                if (await fileExists(minMapFilePath), err => { if (err) console.error(err) }) { await fs.truncate(minMapFilePath, 0, err => { if (err) console.error(err) }) }
+                if (await fileExists(minCSSFilePath)) { await fs.truncate(minCSSFilePath, 0, err => { if (err) console.error(err) }) }
+                if (await fileExists(minMapFilePath)) { await fs.truncate(minMapFilePath, 0, err => { if (err) console.error(err) }) }
                 await fs.writeFile(minCSSFilePath, result.css.toString(), err => { if (err) console.error(err) })
                 await fs.writeFile(minMapFilePath, result.map.toString(), err => { if (err) console.error(err) })
             }
@@ -174,12 +176,22 @@ async function processing(proc_dirname, proc_dirname_dev)
     await Promise.all(svgFiles.map(item => limit(async () => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'svg'))))
     await Promise.all(jsonFiles.map(item => limit(async () => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'json'))))
     await Promise.all(woff2Files.map(item => limit(async () => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'woff2'))))
+    await Promise.all(ttfFiles.map(item => limit(async () =>
+    {
+        if (await needsCaching(proc_dirname, proc_dirname_dev, item.path, 'woff2'))
+        {
+            const output = item.path.replace(proc_dirname_dev, proc_dirname).replace('.ttf', '.woff2')
+            console.log('  | Optimising TTF:       \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
+            await fs.mkdir(dirname(output), { recursive: true }, err => { if (err) console.error(err) })
+            await fs.writeFile(output, ttf2woff2(await fs.readFile(item.path).then(data => data).catch(err => console.error(err))), err => { if (err) console.error(err) })
+        }
+    })))
     await Promise.all(pngFiles.map(item => limit(async () =>
     {
         if (await needsCaching(proc_dirname, proc_dirname_dev, item.path, 'webp'))
         {
             const output = item.path.replace(proc_dirname_dev, proc_dirname).replace('.png', '.webp')
-            console.log('  | Transcoding Image: \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
+            console.log('  | Transcoding Image:    \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
             await fs.mkdir(dirname(output), { recursive: true }, err => { if (err) console.error(err) })
             if (await fileExists(item.path.replace(proc_dirname_dev, proc_dirname))) await fs.unlink(item.path.replace(proc_dirname_dev, proc_dirname))
             try
@@ -228,7 +240,7 @@ async function processing(proc_dirname, proc_dirname_dev)
         if (await needsCaching(proc_dirname, proc_dirname_dev, item.path, 'mp4'))
         {
             const output = item.path.replace(proc_dirname_dev, proc_dirname)
-            console.log(' | Transcoding Video: \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
+            console.log(' | Transcoding Video:    \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
 
             try
             {
@@ -268,7 +280,7 @@ async function processing(proc_dirname, proc_dirname_dev)
     if (!updatesQueued) console.log('  | No files have changed!')
     console.log(' /')
 
-    if (await fileExists(__cache_filename, err => { if (err) console.error(err) })) { await fs.truncate(__cache_filename, 0, err => { if (err) console.error(err) }) }
+    if (await fileExists(__cache_filename)) { await fs.truncate(__cache_filename, 0, err => { if (err) console.error(err) }) }
     await fs.writeFile(__cache_filename, JSON.stringify(cacheEntities, null, '\t'), err => { if (err) console.error(err) })
     await imagePool.close()
 
