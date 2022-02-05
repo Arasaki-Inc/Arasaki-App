@@ -1,5 +1,5 @@
 import { join, resolve, dirname, sep } from 'path'
-import fss, { readFile, writeFile } from 'fs'
+import fss from 'fs'
 import fs from 'fs/promises'
 import process from 'process'
 import { cpus } from 'os'

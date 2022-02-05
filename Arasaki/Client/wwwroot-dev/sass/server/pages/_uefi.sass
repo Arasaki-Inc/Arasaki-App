@@ -1,21 +1,32 @@
 #uefi.page
+    padding-top: 24px
+    padding-bottom: 24px
     #logo
-        width: 14vw
+        width: 300px
         padding: 50px
-    .name
-        color: white
     .uefi
         color: $themeRedNormal
-    #setupButton
-        background-color: $themeRedDarkest
-        border: none
-        color: white
+        text-align: left
+    .text-block
+        backdrop-filter: $backdropBlurHigh
+        background-color: rgba($themeRedNormal, 0.4)
+        padding: #{$cornerClipSizeLarge}px
+        clip-path: polygon(0px #{$cornerClipSizeLarge}px, #{$cornerClipSizeLarge}px 0px, 100% 0px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
+        margin: 20px
+        h1
+            margin-top: 6px
+        i
+            color: black
+    #setup-button
         text-align: center
-        text-decoration: none
-        margin-top: 50px
-        margin-bottom: 100px
-        padding-top: 20px
-        padding-bottom: 20px
+        margin: 20px 20px 20px 10px
+        padding: 30px 50px
         font-size: 30px
-        width: 100%
-        clip-path: polygon(#{$cornerClipSizeMedium}px 0%, calc(100% - #{$cornerClipSizeMedium}px) 0%, 100% #{$cornerClipSizeMedium}px, 100% calc(100% - #{$cornerClipSizeMedium}px), calc(100% - #{$cornerClipSizeMedium}px) 100%, #{$cornerClipSizeMedium}px 100%, 0% calc(100% - #{$cornerClipSizeMedium}px), 0% #{$cornerClipSizeMedium}px)
+        clip-path: polygon(0px #{$cornerClipSizeLarge}px, #{$cornerClipSizeLarge}px 0px, 100% 0px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
+        backdrop-filter: $backdropBlurHigh
+        background-color: rgba($themeRedNormal, 0.4)
+        cursor: pointer
+        transform: rotate(-90deg) translateX(-100%)
+        transform-origin: top left
+        &:hover
+            background-color: rgba($themeRedDarkest, 0.75)

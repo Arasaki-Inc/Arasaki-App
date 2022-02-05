@@ -3,27 +3,26 @@
 
 <PageTitle>Arasaki UEFI</PageTitle>
 
-<div id="uefi" class="row page">
-    <div class="col-1"></div>
+<div id="uefi" class="row page justify-content-center">
     <div class="col">
         <div class="row align-items-center">
             <div class="col-auto">
-                <h1 class="title">A</h1>
-                <h1 class="title">R</h1>
-                <h1 class="title">A</h1>
-                <h1 class="title">S</h1>
-                <h1 class="title">A</h1>
-                <h1 class="title">K</h1>
-                <h1 class="title">I</h1>
+                <h1>A</h1>
+                <h1>R</h1>
+                <h1>A</h1>
+                <h1>S</h1>
+                <h1>A</h1>
+                <h1>K</h1>
+                <h1>I</h1>
             </div>
             <div class="col-auto">
                 <img id="logo" src="/favicon.svg" alt="Logo" />
             </div>
             <div class="col-auto">
-                <h1 class="title">U</h1>
-                <h1 class="title">E</h1>
-                <h1 class="title">F</h1>
-                <h1 class="title">I</h1>
+                <h1>U</h1>
+                <h1>E</h1>
+                <h1>F</h1>
+                <h1>I</h1>
             </div>
             <div class="col-auto">
                 <h1 class="uefi">nified</h1>
@@ -32,9 +31,24 @@
                 <h1 class="uefi">nterface</h1>
             </div>
         </div>
-        <div class="row">
-            <div class="col-6">
-                <h1>Welcome To The Arasaki UEFI</h1>
+        <div class="row justify-content-begin">
+            <div class="col-5 text-block">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle" style="font-size:50px;"></i>
+                    </div>
+                    <div class="col">
+                        <p>
+                            The setup process will only take at most 2 minutes, it is highly recommended that you look at the options provided through it
+                            ESPECIALLY on devices which use a battery and/or limited mobile data/broadband bandwidth!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-begin">
+            <div class="col-5 text-block">
+                <h1>Welcome To Arasaki</h1>
                 <hr />
                 <p>
                     The Arasaki UEFI is a ways and means of setting up your app experience as well as changing things at any other time,
@@ -42,12 +56,9 @@
                     forward as possible and it is virtually impossible for you to do something bad with it.
                 </p>
                 <p>
-                    Every time the app fails to load, there is an update available or something else which needs attention outside of the app,
-                    you will be brought here to resolve anything which arises. If there are any other issues, suggestions, you want to
-                    contribute to the project it self or simply just want to chat, all methods are listed in the About panel!
+                    When the app fails, there is an update available or something else which needs attention outside of the app,
+                    you will be brought here to resolve anything which arises. Check the about page for forms of contact!
                 </p>
-                <hr />
-                <h2>What is the Arasaki App?</h2>
                 <hr />
                 <p>
                     Home to the cutting edge corner of the verse, where each and every citizen, pirate, syndicate leader and alike can learn a little more.
@@ -57,16 +68,9 @@
                     for that big mission, your next luxury yacht but, thats not all. Arasaki contains a database of the Verse as it is, cataloging
                     every planetary/celestial body, space station and more right at your fingertips.
                 </p>
-                <hr />
-                <p>
-                    The setup process will only take at most 2 minutes, it is highly recommended that you look at the options provided through it
-                    ESPECIALLY on devices which use a battery and/or limited mobile data/broadband bandwidth!
-                </p>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-6">
-                <button id="setupButton" onclick="setupAssembly()">Start First Time Setup</button>
+            <div class="col-auto">
+                <div id="setup-button" onclick="setupAssembly()">Start Here</div>
             </div>
         </div>
     </div>

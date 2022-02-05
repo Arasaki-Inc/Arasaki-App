@@ -1,0 +1,15 @@
+﻿<div id="uefi-button" @onclick="SetupServer">
+    <p>Go back to UEFI</p>
+</div>
+
+@inject IJSRuntime JSRuntime
+
+@code 
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private async Task SetupServer() => await JSRuntime.InvokeVoidAsync("setupServer");
+}

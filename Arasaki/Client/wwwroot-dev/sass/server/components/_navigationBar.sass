@@ -14,6 +14,10 @@
         background-color: rgba($themeRedNormal, 0.4)
         color: black
         text-decoration: none
+        &:first-child
+            padding-top: #{$cornerClipSizeLarge}px
+        &:last-child
+            padding-bottom: #{$cornerClipSizeLarge}px
         &.active
             background-color: rgba($themeRedDarkest, 0.4)
             color: white
@@ -27,13 +31,14 @@
             img
                 filter: brightness(0%) invert(100%)
         img
-            width: 4vw
+            width: 70px
             filter: brightness(0%)
         i
-            font-size: 2.5vw
-        h4
+            font-size: 2vw
+        p
             text-align: center
             margin-bottom: 0px
+            font-weight: 600
     hr
         background-color: black
         border-top: 1px solid black

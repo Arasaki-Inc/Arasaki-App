@@ -75,7 +75,7 @@
         This website requires Javascript. If you dont have Javascript enabled, you must find out how to enable it.
         For no reason should Javascript be disabled in the modern day.
     </noscript>
-    <div id="app">
+    <div id="app"> 
 
     </div>
     <script type="text/javascript" src="/_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
@@ -101,6 +101,13 @@
                 }
             }
         }).catch(err => console.error('[SERVICE WORKER]', err))
+    </script>
+    <script type="text/javascript">
+        window.setupServer = () =>
+        {
+            navigator.serviceWorker.getRegistrations().then(registrations => { for (let registration of registrations) registration.unregister() })
+            window.location.reload()
+        }
     </script>
 </body>
 </html>

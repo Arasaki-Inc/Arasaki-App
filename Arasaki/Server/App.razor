@@ -80,5 +80,20 @@
             }
         }
         catch { NavigationManager.NavigateTo("/uefi"); }
+        OnFullPageRefresh += RefreshPage;
+    }
+
+    private static event Action OnFullPageRefresh;
+
+    [JSInvokable("refreshPage")]
+    public static Task RefreshFromWASM()
+    {
+        OnFullPageRefresh?.Invoke();
+        return Task.CompletedTask;
+    }
+
+    private void RefreshPage()
+    {
+        InvokeAsync(StateHasChanged);
     }
 }
