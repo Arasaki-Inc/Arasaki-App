@@ -1,20 +1,20 @@
 import { join, resolve, dirname, sep } from 'path'
-import { statSync, truncate, unlinkSync, readdirSync, readFile } from 'fs'
+import fss from 'fs'
+import fs from 'fs/promises'
 import process from 'process'
-import util from 'util'
+import { cpus } from 'os'
 
 import chokidar from 'chokidar'
 import getFolderSize from 'get-folder-size'
 import sass from 'sass'
 import ffmpeg from 'ffmpeg-static'
-import commandExistsSync from 'command-exists'
+import commandExists from 'command-exists'
 import { ImagePool } from '@squoosh/lib'
-import { cpus } from 'os'
 import { minify } from 'terser'
-import fs from 'fs-extra'
 import exec from 'await-exec'
+import pLimit from 'p-limit'
 
-var readFilePromise = util.promisify(readFile);
+const limit = pLimit(1);
 
 const __project_name = 'Arasaki'
 const __project_introduction = __project_name + ' Bundler by By Connor \'Stryxus\' Shearer.\n'
@@ -30,15 +30,17 @@ var cacheEntities =
     cached: []
 }
 
-function findFiles(path)
+async function fileExists(path)
 {
-    const entries = readdirSync(path, { withFileTypes: true })
+    return await fs.access(path, fss.constants.R_OK | fss.constants.W_OK).then(data => true).catch(err => false)
+}
+
+async function findFiles(path)
+{
+    const entries = await fs.readdir(path, { withFileTypes: true }).then(data => data).catch(err => console.error(err))
     const files = entries.filter(file => !file.isDirectory()).map(file => ({ ...file, path: join(path, file.name) }));
     const folders = entries.filter(folder => folder.isDirectory())
-    for (const folder of folders)
-    {
-        files.push(...findFiles(`${path}${sep}${folder.name}${sep}`))
-    }
+    for (const folder of folders) files.push(...await findFiles(`${path}${sep}${folder.name}${sep}`))
     return files
 }
 
@@ -49,34 +51,21 @@ function filterFiles(files, ext)
 
 async function needsCaching(proc_dirname, proc_dirname_dev, itempath, outExt)
 {
-    var cacheFileExists = await fs.ensureFile(__cache_filename, err => { if (err) { console.error(err) } })
-    if (cacheFileExists)
-    {
-        cacheEntities = await readFilePromise(__cache_filename, 'utf-8').then(data =>
-        {
-            return JSON.parse(data)
-        }).catch(e =>
-        {
-            console.log("Error reading file", e)
-        })
-    }
-    const entryExists = cacheEntities.cached.some(file => file.path === itempath)
+    const entryExists = cacheEntities.cached.map(x => x.path).indexOf(itempath) > -1
     var shouldCache = true
     if (entryExists)
     {
         const entry = cacheEntities.cached.filter(file => file.path === itempath)[0]
-        const outFileExists = await fs.ensureFile(
+        const outFileExists = await fileExists(
             outExt == 'min.css' ? join(proc_dirname, 'bundle.min.css') :
                 outExt == 'min.js' ? join(proc_dirname, 'bundle.min.js') :
-                    itempath.replace(proc_dirname_dev, proc_dirname).substring(0, itempath.lastIndexOf('.') - 4) + '.' + outExt, err => { if (err) { console.error(err) } })
-        shouldCache = outFileExists ? new Date(entry.lastModified).getTime() < statSync(itempath).mtime.getTime() : true
+                    itempath.replace(proc_dirname_dev, proc_dirname).substring(0, itempath.lastIndexOf('.') - 4) + '.' + outExt, err => { if (err) console.error(err) })
+        shouldCache = outFileExists ? new Date(entry.lastModified).getTime() < (await fs.stat(itempath).then(data => data).catch(err => console.error(err))).mtime.getTime() : true
     }
     if (shouldCache)
     {
-        cacheEntities.cached = cacheEntities.cached.filter(f => f.path !== itempath)
-        cacheEntities.cached.push({ path: itempath, lastModified: statSync(itempath).mtime })
-        if (await fs.ensureFile(__cache_filename, err => { if (err) { console.error(err) } })) { await truncate(__cache_filename, 0, err => { if (err) { console.error(err) } }) }
-        await fs.outputFile(__cache_filename, JSON.stringify(cacheEntities, null, '\t'), err => { if (err) { console.error(err) } })
+        if (cacheEntities.cached.map(x => x.path).indexOf(itempath) > -1) cacheEntities.cached.splice(cacheEntities.cached.map(x => x.path).indexOf(itempath), 1)
+        cacheEntities.cached.push({ path: itempath, lastModified: (await fs.stat(itempath).then(data => data).catch(err => console.error(err))).mtime })
         updatesQueued = true
     }
     return shouldCache
@@ -88,8 +77,8 @@ async function runSimpleCopy(itempath, proc_dirname, proc_dirname_dev, identifie
     {
         const output = itempath.replace(proc_dirname_dev, proc_dirname)
         console.log('  | Copying ' + identifier.toUpperCase() + ': \\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
-        await fs.ensureDir(dirname(output), err => { if (err) { console.error(err) } })
-        await fs.copy(itempath, output, err => { if (err) { console.error(err) } })
+        await fs.mkdir(dirname(output), { recursive: true }, err => { if (err) console.error(err) })
+        await fs.copyFile(itempath, output).catch((error) => console.log(error))
     }
 }
 
@@ -111,27 +100,21 @@ async function minifyTypescript(itempath, proc_dirname, proc_dirname_dev, bundle
                 ' --forceConsistentCasingInFileNames --strict --skipLibCheck',
                 (error, stdout, stderr) =>
                 {
-                    if (error) { console.log(`  | [ERROR] Typescript CLI: ${error.message}`) }
-                    else if (stderr) { console.log(` | [ERROR] Typescript CLI: ${stderr}`) }
-                    else { console.log(`  | [INFO] Typescript CLI: ${stdout}`) }
+                    if (error) console.log(`  | [ERROR] Typescript CLI: ${error.message}`)
+                    else if (stderr) console.log(` | [ERROR] Typescript CLI: ${stderr}`)
+                    else console.log(`  | [INFO] Typescript CLI: ${stdout}`)
                 })
-            const result = await minify(await readFilePromise(output, 'utf-8').then(data =>
-            {
-                return data
-            }).catch(e =>
-            {
-                console.log("Error reading file", e)
-            }), { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: true })
-            await truncate(output, 0, err => { if (err) { console.error(err) } })
+            const result = await minify(await fs.readFile(output, 'utf-8').then(data => data).catch(err => console.error(err)), { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: true })
+            await fs.truncate(output, 0, err => { if (err) console.error(err) })
             const mapFilename = output.replace('.js', '.js.map')
-            if (await fs.ensureFile(mapFilename, err => { if (err) { console.error(err) } })) { await truncate(mapFilename, 0, err => { if (err) { console.error(err) } }) }
-            await fs.outputFile(output, result.code, err => { if (err) { console.error(err) } })
-            await fs.outputFile(mapFilename, result.map, err => { if (err) { console.error(err) } })
+            if (await fileExists(mapFilename, err => { if (err) console.error(err) })) { await fs.truncate(mapFilename, 0, err => { if (err) console.error(err) }) }
+            await fs.writeFile(output, result.code, err => { if (err) console.error(err) })
+            await fs.writeFile(mapFilename, result.map, err => { if (err) console.error(err) })
         }
-        catch (e)
+        catch (err)
         {
             console.error('  | ------------------------------------------------------------------------------------------------')
-            console.error('  | Typescript Minification Error: ' + e)
+            console.error('  | Typescript Minification Error: ' + err)
             console.error('  | ------------------------------------------------------------------------------------------------')
         }
     }
@@ -146,7 +129,7 @@ async function processing(proc_dirname, proc_dirname_dev)
     hasTSBundleCompiled = false
     updatesQueued = false
     const imagePool = new ImagePool(cpus().length)
-    const files = findFiles(proc_dirname_dev)
+    const files = await findFiles(proc_dirname_dev)
     const tsFiles = filterFiles(files,    'ts')   .filter(file => String(file.name) != 'service-worker.ts' && String(file.name) != 'service-worker.published.ts')
     const swtsFiles = filterFiles(files,  'ts')   .filter(file => String(file.name) == 'service-worker.ts' || String(file.name) == 'service-worker.published.ts')
     const sassFile = filterFiles(files,   'sass')
@@ -157,9 +140,9 @@ async function processing(proc_dirname, proc_dirname_dev)
     const pngFiles = filterFiles(files,   'png')
     const h264Files = filterFiles(files, 'mp4')
 
-    await Promise.all(tsFiles.map(async item => { await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, true) }))
-    await Promise.all(swtsFiles.map(async item => { await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, false) }))
-    await Promise.all(sassFile.map(async item =>
+    await Promise.all(tsFiles.map(item => limit(async () => await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, true))))
+    await Promise.all(swtsFiles.map(item => limit(async () => await minifyTypescript(item.path, proc_dirname, proc_dirname_dev, false))))
+    await Promise.all(sassFile.map(item => limit(async () =>
     {
         if (await needsCaching(proc_dirname, proc_dirname_dev, item.path, 'min.css') && !hasSASSBundleCompiled)
         {
@@ -169,75 +152,50 @@ async function processing(proc_dirname, proc_dirname_dev)
                 const minCSSFilePath = proc_dirname + sep + 'bundle.min.css'
                 const minMapFilePath = proc_dirname + sep + 'bundle.css.map'
                 console.log('  | Minifying SASS: \\wwwroot\\bundle.min.css - \\wwwroot\\bundle.css.map')
-                await fs.ensureDir(dirname(minCSSFilePath), err => { if (err) { console.error(err) } })
+                await fs.mkdir(dirname(minCSSFilePath), { recursive: true }, err => { if (err) console.error(err) })
                 const result = sass.renderSync(
                     {
                         file: join(proc_dirname_dev, 'sass', 'bundle.sass'), sourceMap: true, outFile: 'bundle.css', outputStyle: isDebug ? 'expanded' : 'compressed', indentType: 'tab', indentWidth: 1, quietDeps: true
                     })
-                if (await fs.ensureFile(minCSSFilePath), err => { if (err) { console.error(err) } }) { await truncate(minCSSFilePath, 0, err => { if (err) { console.error(err) } }) }
-                if (await fs.ensureFile(minMapFilePath), err => { if (err) { console.error(err) } }) { await truncate(minMapFilePath, 0, err => { if (err) { console.error(err) } }) }
-                await fs.outputFile(minCSSFilePath, result.css.toString(), err => { if (err) { console.error(err) } })
-                await fs.outputFile(minMapFilePath, result.map.toString(), err => { if (err) { console.error(err) } })
+                if (await fileExists(minCSSFilePath), err => { if (err) console.error(err) }) { await fs.truncate(minCSSFilePath, 0, err => { if (err) console.error(err) }) }
+                if (await fileExists(minMapFilePath), err => { if (err) console.error(err) }) { await fs.truncate(minMapFilePath, 0, err => { if (err) console.error(err) }) }
+                await fs.writeFile(minCSSFilePath, result.css.toString(), err => { if (err) console.error(err) })
+                await fs.writeFile(minMapFilePath, result.map.toString(), err => { if (err) console.error(err) })
             }
-            catch (e)
+            catch (err)
             {
                 console.error('  | ------------------------------------------------------------------------------------------------')
-                console.error('  | SASS Minification Error: ' + e)
+                console.error('  | SASS Minification Error: ' + err)
                 console.error('  | ------------------------------------------------------------------------------------------------')
             }
         }
-    }))
-    await Promise.all(htmlFiles.map(async item => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'html')))
-    await Promise.all(svgFiles.map(async item => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'svg')))
-    await Promise.all(jsonFiles.map(async item => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'json')))
-    await Promise.all(woff2Files.map(async item => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'woff2')))
-    await Promise.all(pngFiles.map(async item =>
+    })))
+    await Promise.all(htmlFiles.map(item => limit(async () => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'html'))))
+    await Promise.all(svgFiles.map(item => limit(async () => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'svg'))))
+    await Promise.all(jsonFiles.map(item => limit(async () => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'json'))))
+    await Promise.all(woff2Files.map(item => limit(async () => await runSimpleCopy(item.path, proc_dirname, proc_dirname_dev, 'woff2'))))
+    await Promise.all(pngFiles.map(item => limit(async () =>
     {
         if (await needsCaching(proc_dirname, proc_dirname_dev, item.path, 'webp'))
         {
             const output = item.path.replace(proc_dirname_dev, proc_dirname).replace('.png', '.webp')
             console.log('  | Transcoding Image: \\wwwroot-dev' + item.path.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, ''))
-            await fs.ensureDir(dirname(output), err => { if (err) { console.error(err) } })
-            if (await fs.ensureFile(item.path.replace(proc_dirname_dev, proc_dirname), err => { if (err) { console.error(err) } }))
-            {
-                unlinkSync(item.path.replace(proc_dirname_dev, proc_dirname))
-            }
+            await fs.mkdir(dirname(output), { recursive: true }, err => { if (err) console.error(err) })
+            if (await fileExists(item.path.replace(proc_dirname_dev, proc_dirname))) await fs.unlink(item.path.replace(proc_dirname_dev, proc_dirname))
             try
             {
-                const image = imagePool.ingestImage(await readFilePromise(item.path).then(data =>
-                {
-                    return data
-                }).catch(e =>
-                {
-                    console.log("Error reading file", e)
-                }))
+                const image = imagePool.ingestImage(await fs.readFile(item.path).then(data => data).catch(err => console.error(err)))
                 await image.decoded
                 await image.encode({
-                    // Use AVIF as soon as the memory and path bugs are fixed
-                    /*
-                    avif:
-                    {
-                        cqLevel: 45,
-                        cqAlphaLevel: -1,
-                        denoiseLevel: 0,
-                        tileColsLog2: 0,
-                        tileRowsLog2: 0,
-                        speed: 0,
-                        subsample: 1,
-                        chromaDeltaQ: false,
-                        sharpness: 0,
-                        tune: 0
-                    }
-                    */
                     webp:
                     {
-                        quality: 75,
+                        quality: 60,
                         target_size: 0,
                         target_PSNR: 0,
                         method: 6,
                         sns_strength: 100,
                         filter_strength: 100,
-                        filter_sharpness: 0,
+                        filter_sharpness: 1,
                         filter_type: 1,
                         partitions: 0,
                         segments: 4,
@@ -253,23 +211,19 @@ async function processing(proc_dirname, proc_dirname_dev)
                         exact: 0,
                         image_hint: 0,
                         emulate_jpeg_size: 0,
-                        thread_level: 0,
+                        thread_level: 1,
                         low_memory: 0,
                         near_lossless: 100,
                         use_delta_palette: 0,
                         use_sharp_yuv: 0
                     },
                 })
-                const data = (await image.encodedWith.webp).binary
-                await fs.outputFile(output, data, err => { if (err) { console.error(err) } })
+                await fs.writeFile(output, (await image.encodedWith.webp).binary, err => { if (err) console.error(err) })
             }
-            catch (e)
-            {
-                console.error(e)
-            }
+            catch (err) { console.error(err) }
         }
-    }))
-    await Promise.all(h264Files.map(async item =>
+    })))
+    await Promise.all(h264Files.map(item => limit(async () =>
     {
         if (await needsCaching(proc_dirname, proc_dirname_dev, item.path, 'mp4'))
         {
@@ -278,16 +232,16 @@ async function processing(proc_dirname, proc_dirname_dev)
 
             try
             {
-                await fs.ensureDir(dirname(output), err => { if (err) { console.error(err) } })
-                if (commandExistsSync('ffmpeg'))
+                await mkdir(dirname(output), { recursive: true }, err => { if (err) console.error(err) })
+                if (commandExists('ffmpeg').then(data => data).catch((err) => console.error(err)))
                 {
                     await exec('start cmd /C ffmpeg -y -i ' + item.path + (isDebug ? ' -c:v librav1e -rav1e-params speed=10:low_latency=true' : ' -c:v librav1e -b:v 200K -rav1e-params speed=0:low_latency=true') +
                         ' -movflags +faststart -c:a libopus -q:a 128 ' + output,
                         (error, stdout, stderr) =>
                     {
-                            if (error) { console.log(`  | [ERROR] FFMpeg CLI: ${error.message}`) }
-                            else if (stderr) { console.log(` | [ERROR] FFMpeg CLI: ${stderr}`) }
-                            else { console.log(`  | [INFO] FFMpeg CLI: ${stdout}`) }
+                            if (error) console.log(`  | [ERROR] FFMpeg CLI: ${error.message}`)
+                            else if (stderr) console.log(` | [ERROR] FFMpeg CLI: ${stderr}`)
+                            else console.log(`  | [INFO] FFMpeg CLI: ${stdout}`)
                     })
                 }
                 else
@@ -296,9 +250,9 @@ async function processing(proc_dirname, proc_dirname_dev)
                     await exec('start cmd /C ' + ffmpeg + ' -y -i ' + item.path + ' -c:v libaom-av1 ' + (isDebug ? '-crf 52' : '-crf 30 -b:v 200k') + ' -movflags +faststart -c:a libopus -q:a 128 ' + output,
                         (error, stdout, stderr) =>
                     {
-                        if (error) { console.log(`  | [ERROR] FFMpeg CLI: ${error.message}`) }
-                        else if (stderr) { console.log(` | [ERROR] FFMpeg CLI: ${stderr}`) }
-                        else { console.log(`  | [INFO] FFMpeg CLI: ${stdout}`) }
+                        if (error) console.log(`  | [ERROR] FFMpeg CLI: ${error.message}`)
+                        else if (stderr) console.log(` | [ERROR] FFMpeg CLI: ${stderr}`)
+                        else console.log(`  | [INFO] FFMpeg CLI: ${stdout}`)
                     })
                 }
             }
@@ -309,10 +263,14 @@ async function processing(proc_dirname, proc_dirname_dev)
                 console.error('  | ------------------------------------------------------------------------------------------------')
             }
         }
-    }))
+    })))
 
     if (!updatesQueued) console.log('  | No files have changed!')
     console.log(' /')
+
+    if (await fileExists(__cache_filename, err => { if (err) console.error(err) })) { await fs.truncate(__cache_filename, 0, err => { if (err) console.error(err) }) }
+    await fs.writeFile(__cache_filename, JSON.stringify(cacheEntities, null, '\t'), err => { if (err) console.error(err) })
+    await imagePool.close()
 
     const inputSize = await getFolderSize.loose(proc_dirname_dev)
     const outputSize = await getFolderSize.loose(proc_dirname)
@@ -322,7 +280,6 @@ async function processing(proc_dirname, proc_dirname_dev)
     console.log('| > Efficiency: ' + (100 - (outputSize / inputSize * 100)).toFixed(4).toString() + '%')
     console.log('/')
     if (!clearOnUpdate) console.log('\n----------------------------------------------------------------------------------------------------\n')
-    await imagePool.close()
 }
 
 (async () =>
@@ -346,16 +303,15 @@ async function processing(proc_dirname, proc_dirname_dev)
         }
     })
 
+    if (await fileExists(__cache_filename)) cacheEntities = JSON.parse(await fs.readFile(__cache_filename, 'utf-8').then(data => data).catch(err => console.error(err)))
+
     process.title = __project_name + " Bundler"
 
     const __client_dirname = join(__dirname, '../', __project_name, 'Client')
     const __client_wwwroot_dirname = join(__client_dirname, 'wwwroot')
     const __client_wwwrootdev_dirname = join(__client_dirname, 'wwwroot-dev')
-    //const __server_dirname = join(__dirname, '../', __project_name, 'Server')
-    //const __server_wwwroot_dirname = join(__server_dirname, 'wwwroot')
-    //const __server_wwwrootdev_dirname = join(__server_dirname, 'wwwroot-dev')
     await processing(__client_wwwroot_dirname, __client_wwwrootdev_dirname)
-    //await processing(__server_wwwroot_dirname, __server_wwwrootdev_dirname)
+
     if (isDebug)
     {
         chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true }).on('change', async () =>
