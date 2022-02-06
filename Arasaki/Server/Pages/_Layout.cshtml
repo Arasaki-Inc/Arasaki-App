@@ -150,7 +150,7 @@
         window.setupServer = () =>
         {
             navigator.serviceWorker.getRegistrations().then(registrations => { for (let registration of registrations) registration.unregister() })
-            window.location.reload()
+            caches.delete('/index.html').then(found => window.location.reload())
         }
     </script>
 </body>

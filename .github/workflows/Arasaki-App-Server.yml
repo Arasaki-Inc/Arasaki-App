@@ -26,10 +26,13 @@ jobs:
       run: git submodule update --init --recursive
     - name: Restore Dependencies
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
-    - name: Run Arasaki Bundler
+    - name: Restore Node Modules
       run: |
         cd Bundler
         npm i
+    - name: Run Arasaki Bundler
+      run: |
+        cd Bundler
         npm run build:release
     - name: Build Release Executable
       run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
