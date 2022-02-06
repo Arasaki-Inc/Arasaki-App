@@ -17,23 +17,23 @@ const offlineAssetsExclude = [ /^service-worker\.js$/ ]
 
 async function onInstall(event: any)
 {
-    console.info('Arasaki: Installing...')
+    console.info('[Arasaki SW]: Installing...')
     const assetsRequests = self.assetsManifest.assets
         .filter((asset: any) => offlineAssetsInclude.some(pattern => pattern.test(asset.url)))
         .filter((asset: any) => !offlineAssetsExclude.some(pattern => pattern.test(asset.url)))
         .map((asset: any) => new Request(asset.url, { integrity: asset.hash, cache: 'no-cache' }))
     await caches.open(cacheName).then(cache => cache.addAll(assetsRequests))
-    console.info('Arasaki: Installation Complete')
+    console.info('[Arasaki SW]: Installation Complete')
 }
 
 async function onActivate(event: any)
 {
-    console.info('Arasaki: Activating...')
+    console.info('[Arasaki SW]: Activating...')
     const cacheKeys = await caches.keys()
     await Promise.all(cacheKeys
         .filter(key => key.startsWith(cacheNamePrefix) && key !== cacheName)
         .map(key => caches.delete(key)))
-    console.info('Arasaki: Activated')
+    console.info('[Arasaki SW]: Activated')
 }
 
 async function onFetch(event: any)

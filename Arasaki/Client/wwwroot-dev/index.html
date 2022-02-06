@@ -86,21 +86,19 @@
         {
             reg.onupdatefound = () =>
             {
+                console.log('[Arasaki SW]: Updated detected...')
                 const installingWorker = reg.installing
                 installingWorker.onstatechange = () =>
                 {
                     switch (installingWorker.state)
                     {
                         case 'installed':
-                            if (navigator.serviceWorker.controller) 
-                            {
-                                location.reload(true)
-                            }
+                            if (navigator.serviceWorker.controller) location.reload(true)
                             break
                     }
                 }
             }
-        }).catch(err => console.error('[SERVICE WORKER]', err))
+        }).catch(err => console.error('[Arasaki SW]: ' + err))
     </script>
     <script type="text/javascript">
         window.setupServer = () =>
