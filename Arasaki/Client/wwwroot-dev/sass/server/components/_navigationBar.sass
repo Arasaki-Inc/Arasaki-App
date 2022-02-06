@@ -1,40 +1,32 @@
-#navigationBar
+#navigation-bar
     position: fixed
-    top: 50%
-    left: 0px
-    width: #{$navigationBarWidth}px
-    transform: translateY(-50%)
-    backdrop-filter: $backdropBlurHigh
-    clip-path: polygon(0px 0px, calc(100% - #{$cornerClipSizeLarge}px) 0px, 100% #{$cornerClipSizeLarge}px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
     color: black
     z-index: $zIndexNavigationBar
+    & > .row
+        backdrop-filter: $backdropBlurHigh
     & > .row > .col > .row
         padding: 20px 0px
         cursor: pointer
-        background-color: rgba($themeRedNormal, 0.4)
+        background-color: rgba($themeRedNormal, 0.3)
         color: black
         text-decoration: none
-        &:first-child
-            padding-top: #{$cornerClipSizeLarge}px
-        &:last-child
-            padding-bottom: #{$cornerClipSizeLarge}px
         &.active
-            background-color: rgba($themeRedDarkest, 0.4)
+            background-color: rgba($themeRedDarkest, 0.3)
             color: white
-            border-right: 4px solid rgba($themeRedNormal, 0.4)
+            border-right: 4px solid rgba($themeRedNormal, 0.3)
             img
                 filter: brightness(0%) invert(100%)
         &:hover
-            background-color: rgba(0, 0, 0, 0.4)
+            background-color: rgba(0, 0, 0, 0.3)
             color: white
-            border-right: 4px solid rgba($themeRedNormal, 0.4)
+            border-right: 4px solid rgba($themeRedNormal, 0.3)
             img
                 filter: brightness(0%) invert(100%)
         img
             width: 70px
             filter: brightness(0%)
         i
-            font-size: 2vw
+            font-size: 70px
         p
             text-align: center
             margin-bottom: 0px
@@ -46,3 +38,74 @@
         border-left: none
         border-right: none
         margin: 0px
+
+@include media-breakpoint-up(sm) // [768px] Larger Than Small
+
+@include media-breakpoint-up(md) // [992px] Larger Than Medium
+    #navigation-bar
+        top: 50%
+        left: 0px
+        width: #{$navigationBarWidth}px
+        clip-path: polygon(0px 0px, calc(100% - #{$cornerClipSizeLarge}px) 0px, 100% #{$cornerClipSizeLarge}px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
+        transform: translateY(-50%)
+        & > .row > .col > .row
+            &:first-child
+                padding-top: #{$cornerClipSizeLarge}px
+            &:last-child
+                padding-bottom: #{$cornerClipSizeLarge}px
+
+@include media-breakpoint-up(lg) // [1200px] Larger Than Larger
+
+@include media-breakpoint-up(xl) // [14000px] Larger Than XLarger
+
+@include media-breakpoint-down(sm) // [767.98px] Smaller Than Small
+
+@include media-breakpoint-down(md) // [991.98px] Smaller Than Medium
+    #navigation-bar-toggle-button-wrapper
+        position: fixed
+        top: 0px
+        left: 0px
+        background-color: rgba($themeRedNormal, 0.3)
+        backdrop-filter: $backdropBlurHigh
+        height: 60px
+        width: 100vw
+        padding-left: 0px
+        & > .row
+            height: inherit
+        &.active
+            background-color: rgba($themeRedDarkest, 0.3)
+        #navigation-bar-toggle-button
+            width: 24px
+            height: 24px
+            border: 1px solid rgba(255, 255, 255, 0.3)
+            color: rgba(255, 255, 255, 0.3)
+            text-align: center
+            i
+                margin-top: 4px
+    #navigation-bar
+        top: 84px
+        bottom: 24px
+        left: 24px
+        right: 24px
+        margin: 0px
+        clip-path: polygon(0px 0px, calc(100% - #{$cornerClipSizeLarge}px) 0px, 100% #{$cornerClipSizeLarge}px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
+        width: calc(100% - 72px)
+        & > .row > .col > .row
+            &.active
+                border-left: 4px solid rgba($themeRedNormal, 0.3)
+            &:hover
+                border-left: 4px solid rgba($themeRedNormal, 0.3)
+            p
+                margin-top: 0px
+
+@include media-breakpoint-down(lg) // [1199.98px] Smaller Than Large
+
+@include media-breakpoint-down(xl) // [1399.98px] Smaller Than XLarge
+
+@include media-breakpoint-only(sm) // [768px] Small Only
+
+@include media-breakpoint-only(md) // [992px] Medium Only
+
+@include media-breakpoint-only(lg) // [1200px] Large Only
+
+@include media-breakpoint-only(xl) // [1400px] XLarge Only

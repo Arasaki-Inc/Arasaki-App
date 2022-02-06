@@ -1,5 +1,32 @@
 $navigationBarWidth: 160
 
 .page
-    padding-left: #{$navigationBarWidth + (12 * 4) + (12 * 4)}px
     padding-right: 24px
+
+@include media-breakpoint-up(sm) // [768px] Larger Than Small
+
+@include media-breakpoint-up(md) // [992px] Larger Than Medium
+    .page
+        padding-left: #{$navigationBarWidth + (12 * 4) + (12 * 4)}px
+
+@include media-breakpoint-up(lg) // [1200px] Larger Than Larger
+
+@include media-breakpoint-up(xl) // [14000px] Larger Than XLarger
+
+@include media-breakpoint-down(sm) // [767.98px] Smaller Than Small
+
+@include media-breakpoint-down(md) // [991.98px] Smaller Than Medium
+    .page
+        margin-top: 60px
+
+@include media-breakpoint-down(lg) // [1199.98px] Smaller Than Large
+
+@include media-breakpoint-down(xl) // [1399.98px] Smaller Than XLarge
+
+@include media-breakpoint-only(sm) // [768px] Small Only
+
+@include media-breakpoint-only(md) // [992px] Medium Only
+
+@include media-breakpoint-only(lg) // [1200px] Large Only
+
+@include media-breakpoint-only(xl) // [1400px] XLarge Only

@@ -62,6 +62,7 @@
 .      ..       .........ld,.. .  ............. .......','.............''.''.................................     .............cx:............,,;,,',,,,'''''...............'''.'cdc,,'...........      
 --> 
     <meta charset="UTF-8" />
+    <base href="~/" />
     <title>Arasaki UEFI</title>
     <link rel="icon" type="image/svg" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -99,6 +100,7 @@
         @RenderBody()
     </div>
     <script type="text/javascript" src="/_framework/blazor.server.js" id="server-js-bootstrapper"></script>
+    <script type="text/javascript" src="/bundle.min.js"></script>
     <script type="text/javascript">
         function runPWA() 
         {
@@ -128,16 +130,12 @@
             wasmBootstrapper.parentNode.removeChild(wasmBootstrapper)
             let auth =    document.createElement('script')
             let wasm =    document.createElement('script')
-            let bundle =  document.createElement('script')
             auth.id =     'wasm-js-msip'
             wasm.id =     'wasm-js-bootstrapper'
-            bundle.id =   'wasm-js-custom'
             auth.type =   'text/javascript'
             wasm.type =   'text/javascript'
-            bundle.type = 'text/javascript'
             auth.src =    '/_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js'
             wasm.src =    '/_framework/blazor.webassembly.js'
-            bundle.src =  '/bundle.min.js'
             window.history.pushState('', '', '/')
             document.body.appendChild(auth)
             document.body.appendChild(wasm)

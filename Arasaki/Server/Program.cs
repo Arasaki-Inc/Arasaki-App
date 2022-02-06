@@ -8,6 +8,7 @@ using Microsoft.Identity.Web;
 
 using Serilog;
 
+using Arasaki.Server.Data;
 using Arasaki.Server.Data.States;
 
 Logger.Initialise(new LoggerConfiguration().WriteTo.Console(outputTemplate: Logger.DefaultLogFormat).CreateLogger());
@@ -16,7 +17,7 @@ WebApplicationBuilder builder;
 Services.SetConfiguration((builder = WebApplication.CreateBuilder(args)).Configuration);
 if (string.IsNullOrWhiteSpace(builder.Environment.WebRootPath)) builder.Environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 
-builder.WebHost.UseKestrel(ko => ko.ConfigureHttpsDefaults(o => o.SslProtocols = SslProtocols.Tls13));
+builder.WebHost.UseKestrel(k => k.ConfigureHttpsDefaults(o => o.SslProtocols = SslProtocols.Tls13));
 #if DEBUG
 builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = "00000000-0000-0000-0000-000000000000" });
 #else
@@ -34,6 +35,9 @@ builder.Services.AddResponseCompression(options =>
 });
 builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.SmallestSize);
 
+builder.Services.AddSingleton<JSInterop>();
+builder.Services.AddSingleton<JSInterop.RuntimeInterop>();
+builder.Services.AddSingleton<JSInterop.UIInterop>();
 builder.Services.AddSingleton<UIState>();
 
 WebApplication app = builder.Build();

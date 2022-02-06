@@ -1,126 +1,168 @@
-﻿<div id="navigationBar" class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <NavLink class="@(IsSpecialActive ? "row active" : "row")" href="/uefi" @onclick='() => CurrentSelected = "/uefi"' Match="NavLinkMatch.All">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <div class="col-auto">
-                            <img src="/favicon.svg" alt="Logo" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <p>Arasaki UEFI</p>
-                        </div>
-                    </div>
-                </div>
-            </NavLink>
-            <hr />
-            <NavLink class="row" href="/uefi/settings" @onclick='() => CurrentSelected = "/uefi/settings"' Match="NavLinkMatch.All">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <div class="col-auto">
-                            <i class="fas fa-cog"></i>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <p>App Settings</p>
-                        </div>
-                    </div>
-                </div>
-            </NavLink>
-            <hr />
-            <NavLink class="row" href="/uefi/perms" @onclick='() => CurrentSelected = "/uefi/perms"' Match="NavLinkMatch.All">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <div class="col-auto">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <p>Permissions</p>
-                        </div>
-                    </div>
-                </div>
-            </NavLink>
-            <hr />
-            <NavLink class="row" href="/uefi/storage" @onclick='() => CurrentSelected = "/uefi/storage"' Match="NavLinkMatch.All">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <div class="col-auto">
-                            <i class="fas fa-hdd"></i>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <p>Storage</p>
-                        </div>
-                    </div>
-                </div>
-            </NavLink>
-            <hr />
-            <NavLink class="row" href="/uefi/updater" @onclick='() => CurrentSelected = "/uefi/updater"' Match="NavLinkMatch.All">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <div class="col-auto">
-                            <i class="fas fa-wrench"></i>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <p>Arasaki Update</p>
-                        </div>
-                    </div>
-                </div>
-            </NavLink>
-            <hr />
-            <NavLink class="row" href="/uefi/about" @onclick='() => CurrentSelected = "/uefi/about"' Match="NavLinkMatch.All">
-                <div class="col">
-                    <div class="row justify-content-center">
-                        <div class="col-auto">
-                            <i class="fas fa-info"></i>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <p>About Arasaki</p>
-                        </div>
-                    </div>
-                </div>
-            </NavLink>
+﻿@if (IsMobileScreen)
+{
+    <div id="navigation-bar-toggle-button-wrapper" class="@(IsNavigationBarVisible ? "container-fluid active" : "container-fluid")" @onclick="ToggleNavigationBar">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-auto">
+                <div id="navigation-bar-toggle-button"><i class="fas fa-bars"></i></div>
+            </div>
         </div>
     </div>
-</div>
+}
+@if (!IsMobileScreen || IsNavigationBarVisible)
+{
+    <div id="navigation-bar" class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <NavLink class="@(IsSpecialActive ? "row active" : "row")" href="/uefi" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi"))">
+                    <div class="col">
+                        @if (!IsMobileScreen)
+                        {
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    <img src="/favicon.svg" alt="Logo" />
+                                </div>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col">
+                                <p>Arasaki UEFI</p>
+                            </div>
+                        </div>
+                    </div>
+                </NavLink>
+                <hr />
+                <NavLink class="row" href="/uefi/settings" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/settings"))">
+                    <div class="col">
+                        @if (!IsMobileScreen)
+                        {
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col">
+                                <p>App Settings</p>
+                            </div>
+                        </div>
+                    </div>
+                </NavLink>
+                <hr />
+                <NavLink class="row" href="/uefi/perms" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/perms"))">
+                    <div class="col">
+                        @if (!IsMobileScreen)
+                        {
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col">
+                                <p>Permissions</p>
+                            </div>
+                        </div>
+                    </div>
+                </NavLink>
+                <hr />
+                <NavLink class="row" href="/uefi/storage" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/storage"))">
+                    <div class="col">
+                        @if (!IsMobileScreen)
+                        {
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    <i class="fas fa-hdd"></i>
+                                </div>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col">
+                                <p>Storage</p>
+                            </div>
+                        </div>
+                    </div>
+                </NavLink>
+                <hr />
+                <NavLink class="row" href="/uefi/updater" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/updater"))">
+                    <div class="col">
+                        @if (!IsMobileScreen)
+                        {
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    <i class="fas fa-wrench"></i>
+                                </div>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col">
+                                <p>Arasaki Update</p>
+                            </div>
+                        </div>
+                    </div>
+                </NavLink>
+                <hr />
+                <NavLink class="row" href="/uefi/about" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/about"))">
+                    <div class="col">
+                        @if (!IsMobileScreen)
+                        {
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    <i class="fas fa-info"></i>
+                                </div>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col">
+                                <p>About Arasaki</p>
+                            </div>
+                        </div>
+                    </div>
+                </NavLink>
+            </div>
+        </div>
+    </div>
+}
 
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject JSInterop.RuntimeInterop RuntimeInterop
 @inject UIState UIState
 
 @code 
 {
     private bool IsSpecialActive = false;
-    private string CurrentSelected = "/uefi";
+
+    private bool IsMobileScreen = true;
+    private bool IsNavigationBarVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         Uri navURI = new(NavigationManager.Uri);
-        if (UIState.CurrentPageContext.RelativeURLs[0] == "/uefi")
+        SetPageContext(navURI.AbsolutePath);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
         {
-            IsSpecialActive = true;
-            StateHasChanged();
+            IsMobileScreen = await RuntimeInterop.IsMobileScreen(JSRuntime);
+            if (!IsMobileScreen) await InvokeAsync(StateHasChanged);
         }
-        UIState.PageContextHasChanged += () =>
+    }
+
+    private void ToggleNavigationBar() => IsNavigationBarVisible = !IsNavigationBarVisible;
+
+    private void SetPageContext(string relativeURL)
+    {
+        if (!relativeURL.Contains("_blazor"))
         {
+            UIState.CurrentPageContext = UIState.PageContexts.First(x => x.RelativeURLs.Contains(relativeURL));
             IsSpecialActive = UIState.CurrentPageContext.RelativeURLs[0] == "/uefi";
-            InvokeAsync(() => StateHasChanged());
-        };
-        NavigationManager.LocationChanged += (object e, LocationChangedEventArgs args) =>
-        {
-            PageContext newConext = UIState.PageContexts.First(x => x.RelativeURLs.Contains(CurrentSelected));
-            if (!UIState.CurrentPageContext.Equals(newConext)) UIState.CurrentPageContext = newConext;
-            IsSpecialActive = false;
-        };
+            IsNavigationBarVisible = false;
+        }
     }
 }

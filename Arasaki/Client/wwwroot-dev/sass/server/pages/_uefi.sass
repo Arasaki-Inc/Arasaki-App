@@ -1,15 +1,12 @@
 #uefi.page
     padding-top: 24px
     padding-bottom: 24px
-    #logo
-        width: 300px
-        padding: 50px
     .uefi
         color: $themeRedNormal
         text-align: left
     .text-block
         backdrop-filter: $backdropBlurHigh
-        background-color: rgba($themeRedNormal, 0.4)
+        background-color: rgba($themeRedNormal, 0.3)
         padding: #{$cornerClipSizeLarge}px
         clip-path: polygon(0px #{$cornerClipSizeLarge}px, #{$cornerClipSizeLarge}px 0px, 100% 0px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
         margin: 20px
@@ -19,14 +16,48 @@
             color: black
     #setup-button
         text-align: center
-        margin: 20px 20px 20px 10px
         padding: 30px 50px
         font-size: 30px
         clip-path: polygon(0px #{$cornerClipSizeLarge}px, #{$cornerClipSizeLarge}px 0px, 100% 0px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
         backdrop-filter: $backdropBlurHigh
-        background-color: rgba($themeRedNormal, 0.4)
+        background-color: rgba($themeRedNormal, 0.3)
         cursor: pointer
-        transform: rotate(-90deg) translateX(-100%)
-        transform-origin: top left
         &:hover
             background-color: rgba($themeRedDarkest, 0.75)
+
+@include media-breakpoint-up(sm) // [768px] Larger Than Small
+
+@include media-breakpoint-up(md) // [992px] Larger Than Medium
+    #uefi.page
+        #logo
+            width: 300px
+            padding: 50px
+    #setup-button
+        margin: 20px 20px 20px 10px
+        transform: rotate(-90deg) translateX(-100%)
+        transform-origin: top left
+
+@include media-breakpoint-up(lg) // [1200px] Larger Than Larger
+
+@include media-breakpoint-up(xl) // [14000px] Larger Than XLarger
+
+@include media-breakpoint-down(sm) // [767.98px] Smaller Than Small
+
+@include media-breakpoint-down(md) // [991.98px] Smaller Than Medium
+    #uefi.page
+        #logo
+            width: auto
+    #setup-button
+        margin: 20px
+
+@include media-breakpoint-down(lg) // [1199.98px] Smaller Than Large
+
+@include media-breakpoint-down(xl) // [1399.98px] Smaller Than XLarge
+
+@include media-breakpoint-only(sm) // [768px] Small Only
+
+@include media-breakpoint-only(md) // [992px] Medium Only
+
+@include media-breakpoint-only(lg) // [1200px] Large Only
+
+@include media-breakpoint-only(xl) // [1400px] XLarge Only

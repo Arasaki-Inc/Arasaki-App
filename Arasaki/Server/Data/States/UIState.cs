@@ -7,10 +7,7 @@ public class UIState
     private PageContext pageContext;
     public PageContext CurrentPageContext
     {
-        get
-        {
-            return pageContext;
-        }
+        get => pageContext;
         set
         {
             pageContext = value;

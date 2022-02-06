@@ -3,6 +3,16 @@
     "Kestrel": {
       "commandName": "Project",
       "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "inspectUri": "https://localhost:7107/_framework/debug/ws-proxy?browser={browserInspectUri}",
+      "applicationUrl": "https://localhost:7107",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Kestrel Browser": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
       "launchBrowser": true,
       "inspectUri": "https://localhost:7107/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "applicationUrl": "https://localhost:7107",

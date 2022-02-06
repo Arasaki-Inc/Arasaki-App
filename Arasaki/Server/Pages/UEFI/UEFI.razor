@@ -15,24 +15,36 @@
                 <h1>K</h1>
                 <h1>I</h1>
             </div>
-            <div class="col-auto">
+            <div class="col-md-auto col">
                 <img id="logo" src="/favicon.svg" alt="Logo" />
             </div>
             <div class="col-auto">
-                <h1>U</h1>
-                <h1>E</h1>
-                <h1>F</h1>
-                <h1>I</h1>
-            </div>
-            <div class="col-auto">
-                <h1 class="uefi">nified</h1>
-                <h1 class="uefi">xtensible</h1>
-                <h1 class="uefi">irmware</h1>
-                <h1 class="uefi">nterface</h1>
+                <div class="row">
+                    <div class="col-auto">
+                        <h1>U</h1>
+                        <h1>E</h1>
+                        <h1>F</h1>
+                        <h1>I</h1>
+                    </div>
+                    <div class="col-auto">
+                        <h1 class="uefi">nified</h1>
+                        <h1 class="uefi">xtensible</h1>
+                        <h1 class="uefi">irmware</h1>
+                        <h1 class="uefi">nterface</h1>
+                    </div>
+                </div>
             </div>
         </div>
+        @if (IsMobileScreen)
+        {
+            <div class="row">
+                <div class="col">
+                    <div id="setup-button" onclick="setupAssembly()">Start Here</div>
+                </div>
+            </div>
+        }
         <div class="row justify-content-begin">
-            <div class="col-5 text-block">
+            <div class="col-md-5 col text-block">
                 <div class="row align-items-center">
                     <div class="col-auto">
                         <i class="fas fa-exclamation-triangle" style="font-size:50px;"></i>
@@ -47,7 +59,7 @@
             </div>
         </div>
         <div class="row justify-content-begin">
-            <div class="col-5 text-block">
+            <div class="col-md-5 col text-block">
                 <h1>Welcome To Arasaki</h1>
                 <hr />
                 <p>
@@ -69,9 +81,30 @@
                     every planetary/celestial body, space station and more right at your fingertips.
                 </p>
             </div>
-            <div class="col-auto">
-                <div id="setup-button" onclick="setupAssembly()">Start Here</div>
-            </div>
+            @if (!IsMobileScreen)
+            {
+                <div class="col-auto">
+                    <div id="setup-button" onclick="setupAssembly()">Start Here</div>
+                </div>
+            }
         </div>
     </div>
 </div>
+
+@inject IJSRuntime JSRuntime
+@inject JSInterop.RuntimeInterop RuntimeInterop
+
+@code
+{
+    private bool IsMobileScreen = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            IsMobileScreen = await RuntimeInterop.IsMobileScreen(JSRuntime);
+            if (!IsMobileScreen) await InvokeAsync(StateHasChanged);
+        }
+    }
+}

@@ -1,4 +1,6 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿<ContextualBackground />
+<NavigationBar />
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -11,11 +13,10 @@
         </LayoutView>
     </NotFound>
 </Router>
-<ContextualBackground />
-<NavigationBar />
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject JSInterop JSInterop
 @inject UIState UIState
 
 @code
@@ -25,75 +26,59 @@
         await base.OnInitializedAsync();
         Uri navURI = new(NavigationManager.Uri);
         UIState.PageContexts = new()
-            {
-                new PageContext
-                {
-                    PublicName = "Arasaki UEFI",
-                    PrivateName = "uefi",
-                    RelativeURLs = new() { "/uefi", "/" },
-                    BackgroundRelativeURL = "/img/server/backgrounds/uefi.svg"
-                },
-                new PageContext
-                {
-                    PublicName = "App Settings",
-                    PrivateName = "settings",
-                    RelativeURLs = new() { "/uefi/settings" },
-                    BackgroundRelativeURL = "/img/server/backgrounds/settings.svg"
-                },
-                new PageContext
-                {
-                    PublicName = "Permissions",
-                    PrivateName = "permissions",
-                    RelativeURLs = new() { "/uefi/perms" },
-                    BackgroundRelativeURL = "/img/server/backgrounds/permissions.svg"
-                },
-                new PageContext
-                {
-                    PublicName = "Storage",
-                    PrivateName = "storage",
-                    RelativeURLs = new() { "/uefi/storage" },
-                    BackgroundRelativeURL = "/img/server/backgrounds/storage.svg"
-                },
-                new PageContext
-                {
-                    PublicName = "Arasaki Updater",
-                    PrivateName = "updater",
-                    RelativeURLs = new() { "/uefi/updater" },
-                    BackgroundRelativeURL = "/img/server/backgrounds/updater.svg"
-                },
-                new PageContext
-                {
-                    PublicName = "About",
-                    PrivateName = "about",
-                    RelativeURLs = new() { "/uefi/about" },
-                    BackgroundRelativeURL = "/img/server/backgrounds/about.svg"
-                }
-            };
-        try
         {
-            if (navURI.AbsolutePath == "/" || !UIState.PageContexts.Any(o => o.RelativeURLs.Contains(navURI.AbsolutePath))) 
-                UIState.CurrentPageContext = UIState.PageContexts.First(x => x.PrivateName == "uefi");
-            else
+            new PageContext
             {
-                PageContext newConext = UIState.PageContexts.First(x => x.RelativeURLs.Contains(navURI.AbsolutePath));
-                if (!UIState.CurrentPageContext.Equals(newConext)) UIState.CurrentPageContext = newConext;
+                PublicName = "Arasaki UEFI",
+                PrivateName = "uefi",
+                RelativeURLs = new() { "/uefi", "/" },
+                BackgroundRelativeURL = "/img/server/backgrounds/uefi.svg"
+            },
+            new PageContext
+            {
+                PublicName = "App Settings",
+                PrivateName = "settings",
+                RelativeURLs = new() { "/uefi/settings" },
+                BackgroundRelativeURL = "/img/server/backgrounds/settings.svg"
+            },
+            new PageContext
+            {
+                PublicName = "Permissions",
+                PrivateName = "permissions",
+                RelativeURLs = new() { "/uefi/perms" },
+                BackgroundRelativeURL = "/img/server/backgrounds/permissions.svg"
+            },
+            new PageContext
+            {
+                PublicName = "Storage",
+                PrivateName = "storage",
+                RelativeURLs = new() { "/uefi/storage" },
+                BackgroundRelativeURL = "/img/server/backgrounds/storage.svg"
+            },
+            new PageContext
+            {
+                PublicName = "Arasaki Updater",
+                PrivateName = "updater",
+                RelativeURLs = new() { "/uefi/updater" },
+                BackgroundRelativeURL = "/img/server/backgrounds/updater.svg"
+            },
+            new PageContext
+            {
+                PublicName = "About",
+                PrivateName = "about",
+                RelativeURLs = new() { "/uefi/about" },
+                BackgroundRelativeURL = "/img/server/backgrounds/about.svg"
             }
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await JSInterop.InitialiseJSDotNetRuntimeReferences(JSRuntime, Services.Get<JSInterop.RuntimeInterop>(), "runtime");
+            await JSInterop.InitialiseJSDotNetRuntimeReferences(JSRuntime, Services.Get<JSInterop.UIInterop>(), "ui");
         }
-        catch { NavigationManager.NavigateTo("/uefi"); }
-        OnFullPageRefresh += RefreshPage;
-    }
-
-    private static event Action OnFullPageRefresh;
-
-    [JSInvokable("refreshPage")]
-    public static Task RefreshFromWASM()
-    {
-        OnFullPageRefresh?.Invoke();
-        return Task.CompletedTask;
-    }
-
-    private void RefreshPage()
-    {
-        InvokeAsync(StateHasChanged);
     }
 }
