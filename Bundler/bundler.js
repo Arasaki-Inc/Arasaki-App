@@ -18,7 +18,7 @@ import ttf2woff2 from 'ttf2woff2'
 const limit = pLimit(1);
 
 const __project_name = 'Arasaki'
-const __project_introduction = __project_name + ' Bundler by By Connor \'Stryxus\' Shearer.\n'
+const __project_introduction = __project_name + ' Bundler By Connor \'Stryxus\' Shearer.\n'
 
 const __dirname = resolve()
 const __cache_filename = join(__dirname, __project_name.toLocaleLowerCase() + '-cache.json')
