@@ -37,7 +37,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CE770B9D-3C74-4D18-B4F5-4953FF824615}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		clear_wwwroot.cmd = clear_wwwroot.cmd
 		setup.cmd = setup.cmd
 	EndProjectSection
 EndProject
