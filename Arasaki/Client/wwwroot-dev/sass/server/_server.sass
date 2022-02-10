@@ -1,33 +1,41 @@
-$navigationBarWidth: 160
+@import "variables"
+
+@import "components/navigationBar"
+
+@import "pages/uefi"
+@import "pages/settings"
+@import "pages/permissions"
+@import "pages/storage"
+@import "pages/updater"
+@import "pages/about"
 
 .page
     padding-right: 24px
-    z-index: $zIndexPageContainer
-
+    z-index: $server_zIndexPageContainer
+    .text-block
+        backdrop-filter: $backdropBlurHigh
+        background-color: $themeRedNormalTransparencyHigh
+        padding: #{$cornerClipSizeLarge}px
+        clip-path: polygon(0px #{$cornerClipSizeLarge}px, #{$cornerClipSizeLarge}px 0px, 100% 0px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
+        margin: 20px
+        h1
+            margin-top: 6px
+        i
+            color: black
 @include media-breakpoint-up(sm) // [768px] Larger Than Small
-
 @include media-breakpoint-up(md) // [992px] Larger Than Medium
     .page
-        padding-left: #{$navigationBarWidth + (12 * 4) + (12 * 4)}px
-
+        padding-left: #{$server_NavigationBarWidth + (12 * 4) + (12 * 4)}px
+        padding-right: #{24 * 4}px
 @include media-breakpoint-up(lg) // [1200px] Larger Than Larger
-
 @include media-breakpoint-up(xl) // [14000px] Larger Than XLarger
-
 @include media-breakpoint-down(sm) // [767.98px] Smaller Than Small
-
 @include media-breakpoint-down(md) // [991.98px] Smaller Than Medium
     .page
         margin-top: 60px
-
 @include media-breakpoint-down(lg) // [1199.98px] Smaller Than Large
-
 @include media-breakpoint-down(xl) // [1399.98px] Smaller Than XLarge
-
 @include media-breakpoint-only(sm) // [768px] Small Only
-
 @include media-breakpoint-only(md) // [992px] Medium Only
-
 @include media-breakpoint-only(lg) // [1200px] Large Only
-
 @include media-breakpoint-only(xl) // [1400px] XLarge Only
