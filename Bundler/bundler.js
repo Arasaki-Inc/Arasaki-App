@@ -97,7 +97,7 @@ async function minifyTypescript(itempath, proc_dirname, proc_dirname_dev, bundle
             const output = bundle ? join(proc_dirname, 'bundle.min.js') : itempath.replace(proc_dirname_dev, proc_dirname).replace('.ts', '.js')
             console.log('  | Minifying Typescript: ' + (bundle ? '\\wwwroot\\bundle.min.js - \\wwwroot\\bundle.js.map' : '\\wwwroot-dev' + itempath.replace(proc_dirname_dev, '') + ' > \\wwwroot' + output.replace(proc_dirname, '')))
             await exec('npx tsc ' + (bundle ? join(proc_dirname_dev, 'ts', 'bundle.ts') + ' --outFile "' + output + '"' : itempath + ' --outDir ' + proc_dirname) +
-                ' --target ES2021 --lib DOM,ES2021' + (bundle ? ' --module none --esModuleInterop --allowSyntheticDefaultImports' : ',WebWorker') +
+                ' --target ES2021 --lib DOM,ES2021' + (bundle ? ' --module amd' : ',WebWorker') +
                 ' --forceConsistentCasingInFileNames --strict --skipLibCheck --noImplicitAny --importsNotUsedAsValues preserve',
                 (error, stdout, stderr) =>
                 {
@@ -105,7 +105,12 @@ async function minifyTypescript(itempath, proc_dirname, proc_dirname_dev, bundle
                     else if (stderr) console.log(` | [ERROR] Typescript CLI: ${stderr}`)
                     else console.log(`  | [INFO] Typescript CLI: ${stdout}`)
                 })
-            const result = await minify(await fs.readFile(output, 'utf-8').then(data => data).catch(err => console.error(err)), { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: true })
+            const result = await minify(
+                (bundle ? await fs.readFile(join(proc_dirname_dev, 'node_modules', 'requirejs', 'require.js'), 'utf-8')
+                    .then(data => data).catch(err => console.error(err)) : '') +
+                await fs.readFile(output, 'utf-8')
+                    .then(data => data).catch(err => console.error(err)),
+                { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: true })
             await fs.truncate(output, 0, err => { if (err) console.error(err) })
             const mapFilename = output.replace('.js', '.js.map')
             if (await fileExists(mapFilename)) { await fs.truncate(mapFilename, 0, err => { if (err) console.error(err) }) }
@@ -130,7 +135,7 @@ async function processing(proc_dirname, proc_dirname_dev)
     hasTSBundleCompiled = false
     updatesQueued = false
     const imagePool = new ImagePool(cpus().length)
-    const files = await findFiles(proc_dirname_dev)
+    const files = (await findFiles(proc_dirname_dev)).filter(file => !String(file.name).includes('node_modules'))
     const tsFiles = filterFiles(files,    'ts')    .filter(file => String(file.name) != 'service-worker.ts' && String(file.name) != 'service-worker.published.ts')
     const swtsFiles = filterFiles(files,  'ts')    .filter(file => String(file.name) == 'service-worker.ts' || String(file.name) == 'service-worker.published.ts')
     const sassFile = filterFiles(files,   'sass')
@@ -326,7 +331,7 @@ async function processing(proc_dirname, proc_dirname_dev)
 
     if (isDebug)
     {
-        chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true }).on('change', async () =>
+        chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true, ignores: 'node_modules' }).on('change', async () =>
         {
             if (clearOnUpdate)
             {
