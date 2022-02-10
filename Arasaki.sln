@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bundler", "Bundler", "{CC6B
 		Bundler\bundle_install.cmd = Bundler\bundle_install.cmd
 		Bundler\bundle_release.cmd = Bundler\bundle_release.cmd
 		Bundler\bundler.js = Bundler\bundler.js
+		Bundler\clear_wwwroot.cmd = Bundler\clear_wwwroot.cmd
 		Bundler\package-lock.json = Bundler\package-lock.json
 		Bundler\package.json = Bundler\package.json
 	EndProjectSection
@@ -36,6 +37,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CE770B9D-3C74-4D18-B4F5-4953FF824615}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		clear_wwwroot.cmd = clear_wwwroot.cmd
+		setup.cmd = setup.cmd
 	EndProjectSection
 EndProject
 Global
