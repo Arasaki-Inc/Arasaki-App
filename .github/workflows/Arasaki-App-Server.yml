@@ -22,13 +22,15 @@ jobs:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
     - name: Setup .NET WASM
       run: dotnet workload install wasm-tools
-    - name: Setup Submodules
+    - name: Restore Submodules
       run: git submodule update --init --recursive
     - name: Restore Dependencies
       run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
-    - name: Restore Node Modules
+    - name: Restore NPM Packages
       run: |
         cd Bundler
+        npm i
+        cd ../Arasaki/Client/wwwroot-dev
         npm i
     - name: Run Arasaki Bundler
       run: |
