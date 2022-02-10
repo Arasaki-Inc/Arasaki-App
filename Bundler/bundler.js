@@ -110,7 +110,7 @@ async function minifyTypescript(itempath, proc_dirname, proc_dirname_dev, bundle
                     .then(data => data).catch(err => console.error(err)) : '') +
                 await fs.readFile(output, 'utf-8')
                     .then(data => data).catch(err => console.error(err)),
-                { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: true })
+                { sourceMap: true, module: false, mangle: false, ecma: 2021, compress: !isDebug })
             await fs.truncate(output, 0, err => { if (err) console.error(err) })
             const mapFilename = output.replace('.js', '.js.map')
             if (await fileExists(mapFilename)) { await fs.truncate(mapFilename, 0, err => { if (err) console.error(err) }) }
