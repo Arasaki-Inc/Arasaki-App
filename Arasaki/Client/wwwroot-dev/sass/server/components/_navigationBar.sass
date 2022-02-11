@@ -7,19 +7,20 @@
     & > .row > .col > .row
         padding: 20px 0px
         cursor: pointer
-        background-color: $themeRedNormalTransparencyHigh
+        background-color: $themeRedDarkerTransparencyHigh
         color: white
         text-decoration: none
+        border-right: 4px solid transparent
         &.active
-            background-color: $themeRedDarkestTransparencyHigh
-            color: $themeRedNormal
-            border-right: 4px solid $themeRedNormalTransparencyHigh
+            background-color: rgba(0, 0, 0, 0.3)
+            color: $themeRedDarker
+            border-right-color: $themeRedDarkerTransparencyHigh
             img
                 filter: brightness(100%)
         &:hover
-            background-color: rgba(0, 0, 0, 0.3)
-            color: $themeRedDarker
-            border-right: 4px solid $themeRedNormalTransparencyHigh
+            background-color: $themeRedDarkestTransparencyHigh
+            color: $themeRedLight
+            border-right-color: $themeRedDarkerTransparencyHigh
             img
                 filter: brightness(100%)
         img
@@ -59,7 +60,7 @@
         position: fixed
         top: 0px
         left: 0px
-        background-color: $themeRedNormalTransparencyHigh
+        background-color: $themeRedDarkerTransparencyHigh
         backdrop-filter: $backdropBlurHigh
         height: 60px
         width: 100vw
@@ -85,9 +86,9 @@
         width: calc(100% - 72px)
         & > .row > .col > .row
             &.active
-                border-left: 4px solid $themeRedNormalTransparencyHigh
+                border-left: 4px solid $themeRedDarkerTransparencyHigh
             &:hover
-                border-left: 4px solid $themeRedNormalTransparencyHigh
+                border-left: 4px solid $themeRedDarkerTransparencyHigh
             p
                 margin-top: 0px
 @include media-breakpoint-down(lg) // [1199.98px] Smaller Than Large
