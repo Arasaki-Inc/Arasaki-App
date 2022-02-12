@@ -52,7 +52,7 @@
                     <div class="col">
                         <p>
                             The setup process will only take at most 2 minutes, it is highly recommended that you look at the options provided through it
-                            ESPECIALLY on devices which use a battery and/or limited mobile data/broadband bandwidth!
+                            ESPECIALLY on devices which use a battery and/or internet speed/data!
                         </p>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
 </div>
 
 @inject IJSRuntime JSRuntime
-@inject JSInterop.RuntimeInterop RuntimeInterop
+@inject JSInterop.UIInterop UIInterop
 
 @code
 {
@@ -103,7 +103,7 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            IsMobileScreen = await RuntimeInterop.IsMobileScreen(JSRuntime);
+            IsMobileScreen = await UIInterop.IsMobileScreen(JSRuntime);
             if (!IsMobileScreen) await InvokeAsync(StateHasChanged);
         }
     }
