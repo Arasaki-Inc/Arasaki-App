@@ -1,0 +1,24 @@
+﻿<div id="version-display" class="col-auto" @onmouseover="@(() => OnHover(true))" @onmouseout="@(() => OnHover(false))">
+    @if (IsHovering)
+    {
+        <p>@(Runtime.RuntimeBuildDate)</p>
+    }
+    else
+    {
+        <p>v@(Runtime.Version)</p>
+    }
+</div>
+
+@code {
+
+    private bool IsHovering = false;
+
+    private void OnHover(bool isHovering)
+    {
+        if (IsHovering != isHovering)
+        {
+            IsHovering = isHovering;
+            StateHasChanged();
+        }
+    }
+}

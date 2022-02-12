@@ -120,6 +120,12 @@
                         </div>
                     </div>
                 </NavLink>
+                @if (IsMobileScreen)
+                {
+                    <div class="row">
+                        <VersionDisplay />
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -127,7 +133,7 @@
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
-@inject JSInterop.RuntimeInterop RuntimeInterop
+@inject JSInterop.UIInterop UIInterop
 @inject UIState UIState
 
 @code 
@@ -149,7 +155,7 @@
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            IsMobileScreen = await RuntimeInterop.IsMobileScreen(JSRuntime);
+            IsMobileScreen = await UIInterop.IsMobileScreen(JSRuntime);
             if (!IsMobileScreen) await InvokeAsync(StateHasChanged);
         }
     }

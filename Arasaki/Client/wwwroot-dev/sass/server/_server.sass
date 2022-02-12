@@ -1,6 +1,7 @@
 @import "variables"
 
 @import "components/navigationBar"
+@import "components/footer"
 
 @import "pages/uefi"
 @import "pages/settings"
@@ -10,7 +11,6 @@
 @import "pages/about"
 
 .page
-    padding-right: 24px
     z-index: $server_zIndexPageContainer
     .text-block
         backdrop-filter: $backdropBlurHigh
@@ -25,14 +25,17 @@
 @include media-breakpoint-up(sm) // [768px] Larger Than Small
 @include media-breakpoint-up(md) // [992px] Larger Than Medium
     .page
-        padding-left: #{$server_NavigationBarWidth + (12 * 4) + (12 * 4)}px
+        padding-top: 24px
+        padding-bottom: 86px
+        padding-left: #{$server_navigationBarWidth + (12 * 4) + (12 * 4)}px
         padding-right: #{24 * 4}px
 @include media-breakpoint-up(lg) // [1200px] Larger Than Larger
 @include media-breakpoint-up(xl) // [14000px] Larger Than XLarger
 @include media-breakpoint-down(sm) // [767.98px] Smaller Than Small
 @include media-breakpoint-down(md) // [991.98px] Smaller Than Medium
     .page
-        margin-top: 60px
+        padding-top: 60px
+        padding-right: 24px
 @include media-breakpoint-down(lg) // [1199.98px] Smaller Than Large
 @include media-breakpoint-down(xl) // [1399.98px] Smaller Than XLarge
 @include media-breakpoint-only(sm) // [768px] Small Only
