@@ -8,11 +8,12 @@ public class JSInterop
 
     public class RuntimeInterop
     {
-        public async Task<bool> IsMobileScreen(IJSRuntime jsr) => await jsr.InvokeAsync<bool>("runtime.isMobileScreen");
+
     }
 
     public class UIInterop
     {
-
+        public async Task<bool> IsMobileScreen(IJSRuntime jsr) => await jsr.InvokeAsync<bool>("ui.isMobileScreen");
+        public async Task<bool> IsTabletScreen(IJSRuntime jsr) => await jsr.InvokeAsync<bool>("ui.isTabletScreen");
     }
 }
