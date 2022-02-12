@@ -10,23 +10,23 @@ using Serilog;
 
 Logger.Initialise(new LoggerConfiguration().WriteTo.Console(outputTemplate: Logger.DefaultLogFormat).CreateLogger());
 
-WebAssemblyHost Host;
-WebAssemblyHostBuilder HostBuilder = WebAssemblyHostBuilder.CreateDefault(args);
-Services.SetConfiguration(HostBuilder.Configuration);
-HostBuilder.RootComponents.Add<App>("#app");
-HostBuilder.RootComponents.Add<HeadOutlet>("head::after");
-HostBuilder.Services.AddHttpClient("Arasaki.ServerAPI", client => client.BaseAddress = new Uri(HostBuilder.HostEnvironment.BaseAddress)).AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
-HostBuilder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Arasaki.ServerAPI"));
-HostBuilder.Services.AddMsalAuthentication(options =>
+WebAssemblyHost host;
+WebAssemblyHostBuilder builder = WebAssemblyHostBuilder.CreateDefault(args);
+Services.SetConfiguration(builder.Configuration);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+builder.Services.AddHttpClient("Arasaki.ServerAPI", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)).AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("Arasaki.ServerAPI"));
+builder.Services.AddMsalAuthentication(o =>
 {
-    HostBuilder.Configuration.Bind("AzureAdB2C", options.ProviderOptions.Authentication);
-    options.ProviderOptions.DefaultAccessTokenScopes.Add("https://arasakiB2C.onmicrosoft.com/6a29b831-2d5a-4421-9c7d-4905f3c3e9e2/API.Access");
+    builder.Configuration.Bind("AzureAdB2C", o.ProviderOptions.Authentication);
+    o.ProviderOptions.DefaultAccessTokenScopes.Add("https://arasakiB2C.onmicrosoft.com/6a29b831-2d5a-4421-9c7d-4905f3c3e9e2/API.Access");
 });
-HostBuilder.Services.AddAuthorizationCore(o =>
+builder.Services.AddAuthorizationCore(o =>
 {
     o.AddPolicy("UserIsAdmin", policy => policy.Requirements.Add(new UserGroupsRequirement(new string[] { "Admins" })));
 });
-HostBuilder.Services.AddSingleton<IAuthorizationHandler, UserGroupsHandler>();
-Host = HostBuilder.Build();
-Services.SetServiceProvider(Host.Services);
-await Host.RunAsync();
+builder.Services.AddSingleton<IAuthorizationHandler, UserGroupsHandler>();
+host = builder.Build();
+Services.SetServiceProvider(host.Services);
+await host.RunAsync();
