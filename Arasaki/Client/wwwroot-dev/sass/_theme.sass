@@ -13,36 +13,21 @@ html, body
 ::-webkit-scrollbar 
     display: none
     width: 0px
-h1
-    font-size: 36px
-    margin: 20px 0px
-h2
-    font-size: 32px
-    margin: 18px 0px
-h3
-    font-size: 28px
-    margin: 18px 0px
-h4
-    font-size: 24px
-    margin: 16px 0px
-h5
-    font-size: 20px
-    margin: 16px 0px
-p
-    font-size: 16px
-    margin: 16px 0px
-small
-    font-size: 12px
-    margin: 12px 0px
-p, small
+p, a, small
     letter-spacing: 1px
     line-height: 24px
+p, a
+    font-size: 14px
+    margin: 16px 0px
 a
     text-decoration: none
     color: $themeRedLighter
     border: none
     &:hover
         text-decoration: underline
+small
+    font-size: 12px
+    margin: 12px 0px
 img 
     display: block
     object-fit: contain
@@ -56,31 +41,64 @@ hr
     z-index: $zIndexBackground
     bottom: 0px
     right: 0px
-
 @include media-breakpoint-up(sm) // [768px] Larger Than Small
-
 @include media-breakpoint-up(md) // [992px] Larger Than Medium
+    h1
+        font-size: 36px
+        margin: 20px 0px
+    h2
+        font-size: 32px
+        margin: 18px 0px
+    h3
+        font-size: 28px
+        margin: 18px 0px
+    h4
+        font-size: 24px
+        margin: 16px 0px
+    h5
+        font-size: 20px
+        margin: 16px 0px
+    p, a, small
+        letter-spacing: 1px
+        line-height: 24px
+    p, a
+        font-size: 14px
+        margin: 16px 0px
+    a
+        text-decoration: none
+        color: $themeRedLighter
+        border: none
+        &:hover
+            text-decoration: underline
+    small
+        font-size: 12px
+        margin: 12px 0px
     #background
         height: 100vh
-
 @include media-breakpoint-up(lg) // [1200px] Larger Than Larger
-
 @include media-breakpoint-up(xl) // [14000px] Larger Than XLarger
-
 @include media-breakpoint-down(sm) // [767.98px] Smaller Than Small
-
 @include media-breakpoint-down(md) // [991.98px] Smaller Than Medium
+    h1
+        font-size: 30px
+        margin: 16px 0px
+    h2
+        font-size: 28px
+        margin: 14px 0px
+    h3
+        font-size: 24px
+        margin: 14px 0px
+    h4
+        font-size: 22px
+        margin: 10px 0px
+    h5
+        font-size: 18px
+        margin: 10px 0px
     #background
         height: 70vh
-
 @include media-breakpoint-down(lg) // [1199.98px] Smaller Than Large
-
 @include media-breakpoint-down(xl) // [1399.98px] Smaller Than XLarge
-
 @include media-breakpoint-only(sm) // [768px] Small Only
-
 @include media-breakpoint-only(md) // [992px] Medium Only
-
 @include media-breakpoint-only(lg) // [1200px] Large Only
-
 @include media-breakpoint-only(xl) // [1400px] XLarge Only
