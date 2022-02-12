@@ -42,7 +42,6 @@ builder.Services.AddSingleton<UIState>();
 
 WebApplication app = builder.Build();
 Services.SetServiceProvider(app.Services.CreateScope().ServiceProvider);
-References.IsDevelopmentMode = app.Environment.IsDevelopment();
 
 if (app.Environment.IsDevelopment())
 {
@@ -65,5 +64,5 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-if (References.IsDevelopmentMode) await app.RunAsync("https://0.0.0.0:7107");
+if (Runtime.IsDevelopmentMode) await app.RunAsync("https://0.0.0.0:7107");
 else await app.RunAsync();
