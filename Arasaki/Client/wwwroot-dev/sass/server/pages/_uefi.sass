@@ -1,6 +1,4 @@
 #uefi.page
-    padding-top: 24px
-    padding-bottom: 24px
     .uefi
         color: $themeRedNormal
         text-align: left
@@ -29,6 +27,10 @@
 @include media-breakpoint-down(sm) // [767.98px] Smaller Than Small
 @include media-breakpoint-down(md) // [991.98px] Smaller Than Medium
     #uefi.page
+        & > .col > .row
+            &:first-child
+                margin-left: 12px
+                margin-right: 12px
         #logo
             width: auto
     #setup-button
