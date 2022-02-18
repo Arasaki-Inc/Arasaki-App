@@ -10,6 +10,7 @@ using Serilog;
 
 using Arasaki.Server.Data;
 using Arasaki.Server.Data.States;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 Logger.Initialise(new LoggerConfiguration().WriteTo.Console(outputTemplate: Logger.DefaultLogFormat).CreateLogger());
 
@@ -17,7 +18,19 @@ WebApplicationBuilder builder;
 Services.SetConfiguration((builder = WebApplication.CreateBuilder(args)).Configuration);
 if (string.IsNullOrWhiteSpace(builder.Environment.WebRootPath)) builder.Environment.WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
 
-builder.WebHost.UseKestrel(k => k.ConfigureHttpsDefaults(o => o.SslProtocols = SslProtocols.Tls13));
+builder.WebHost.UseQuic().UseKestrel(o => 
+{
+#if DEBUG
+    o.ListenAnyIP(7107, x =>
+#else
+    o.ListenAnyIP(8080, x =>
+#endif
+    {
+        x.Protocols = HttpProtocols.Http3 | HttpProtocols.Http2;
+        x.UseHttps();
+    });
+    o.AddServerHeader = false;
+});
 #if DEBUG
 builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = "00000000-0000-0000-0000-000000000000" });
 #else
@@ -64,5 +77,5 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-if (Runtime.IsDevelopmentMode) await app.RunAsync("https://0.0.0.0:7107");
+if (Runtime.IsDevelopmentMode) await app.RunAsync();
 else await app.RunAsync();
