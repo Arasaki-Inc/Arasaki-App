@@ -1,7 +1,7 @@
-﻿<div id="version-display" class="col-auto" @onmouseover="@(() => OnHover(true))" @onmouseout="@(() => OnHover(false))">
+﻿<div class="col-auto version-display" @onpointerover="@(() => OnHover(true))" @onpointerout="@(() => OnHover(false))">
     @if (IsHovering)
     {
-        <p>@(Runtime.RuntimeBuildDate)</p>
+        <small>@(Runtime.RuntimeBuildDate)</small>
     }
     else
     {
