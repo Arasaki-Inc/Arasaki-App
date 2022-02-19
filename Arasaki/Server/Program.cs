@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.Security.Authentication;
 
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
