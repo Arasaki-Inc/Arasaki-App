@@ -19,15 +19,6 @@ if (string.IsNullOrWhiteSpace(builder.Environment.WebRootPath)) builder.Environm
 
 builder.WebHost.UseQuic().UseKestrel(o => 
 {
-#if DEBUG
-    o.ListenAnyIP(7107, x =>
-#else
-    o.ListenAnyIP(8080, x =>
-#endif
-    {
-        x.Protocols = HttpProtocols.Http3 | HttpProtocols.Http2;
-        x.UseHttps();
-    });
     o.AddServerHeader = false;
 });
 #if DEBUG
@@ -76,5 +67,5 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-if (Runtime.IsDevelopmentMode) await app.RunAsync();
+if (Runtime.IsDevelopmentMode) await app.RunAsync("https://0.0.0.0:7107");
 else await app.RunAsync();
