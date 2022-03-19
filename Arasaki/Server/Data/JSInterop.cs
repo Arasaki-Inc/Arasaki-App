@@ -8,7 +8,7 @@ public class JSInterop
 
     public class RuntimeInterop
     {
-
+        public async Task UpdateApp(IJSRuntime jsr) => await jsr.InvokeVoidAsync("runtime.updateApp");
     }
 
     public class UIInterop

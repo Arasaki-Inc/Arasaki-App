@@ -67,25 +67,7 @@
                     </div>
                 </NavLink>
                 <hr />
-                <NavLink class="row" href="/uefi/storage" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/storage"))">
-                    <div class="col">
-                        @if (!IsMobileScreen)
-                        {
-                            <div class="row justify-content-center">
-                                <div class="col-auto">
-                                    <i class="fas fa-hdd"></i>
-                                </div>
-                            </div>
-                        }
-                        <div class="row">
-                            <div class="col">
-                                <p>Storage</p>
-                            </div>
-                        </div>
-                    </div>
-                </NavLink>
-                <hr />
-                <NavLink class="row" href="/uefi/updater" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/updater"))">
+                <NavLink class="row" href="/uefi/changelog" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/changelog"))">
                     <div class="col">
                         @if (!IsMobileScreen)
                         {
@@ -97,7 +79,7 @@
                         }
                         <div class="row">
                             <div class="col">
-                                <p>Arasaki Update</p>
+                                <p>Changelog</p>
                             </div>
                         </div>
                     </div>

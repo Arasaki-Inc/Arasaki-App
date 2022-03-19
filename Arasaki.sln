@@ -20,10 +20,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bundler", "Bundler", "{CC6BCFCE-65E9-40E3-B12E-ED2C6E91485C}"
 	ProjectSection(SolutionItems) = preProject
 		Bundler\arasaki-cache.json = Bundler\arasaki-cache.json
+		Bundler\bundler.js = Bundler\bundler.js
 		Bundler\bundle_debug.cmd = Bundler\bundle_debug.cmd
 		Bundler\bundle_install.cmd = Bundler\bundle_install.cmd
 		Bundler\bundle_release.cmd = Bundler\bundle_release.cmd
-		Bundler\bundler.js = Bundler\bundler.js
 		Bundler\clear_wwwroot.cmd = Bundler\clear_wwwroot.cmd
 		Bundler\package-lock.json = Bundler\package-lock.json
 		Bundler\package.json = Bundler\package.json

@@ -125,7 +125,7 @@
         }
     </script>
     <script type="text/javascript">
-        function setupAssembly() 
+        function setupAssembly(update = false) 
         {
             let wasmBootstrapper = document.getElementById('server-js-bootstrapper')
             wasmBootstrapper.parentNode.removeChild(wasmBootstrapper)
@@ -140,7 +140,6 @@
             window.history.pushState('', '', '/')
             document.body.appendChild(auth)
             document.body.appendChild(wasm)
-            document.body.appendChild(bundle)
             runPWA()
         }
 
