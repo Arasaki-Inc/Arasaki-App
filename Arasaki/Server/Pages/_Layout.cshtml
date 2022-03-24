@@ -128,7 +128,7 @@
                         switch (iw.state)
                         {
                             case 'installed':
-                                if (navigator.serviceWorker.controller) location.reload(true)
+                                if (navigator.serviceWorker.controller) window.location.reload(true)
                                 break
                         }
                     }
@@ -136,7 +136,7 @@
             }).catch(err => console.error(err))
         }
 
-        window.setupServer = () => caches.delete('index.html').then(found => window.location.reload())
+        window.setupServer = () => caches.delete('index.html').then(found => window.location.replace(window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1]))
     </script>
 </body>
 </html>
