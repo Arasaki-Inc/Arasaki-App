@@ -103,7 +103,9 @@
         window.setupServer = () => 
         {
             navigator.serviceWorker.getRegistrations().then((sws) => { for(let sw of sws) sw.unregister(); });
-            caches.delete('index.html').then(found => window.location.reload())
+            var assets  = document.createElement('script')
+            assets.src = '/service-worker-assets.js';
+            caches.open(`offline-cache-` + window.assetsManifest.version).then(cache => cache.delete('index.html').then((resp) => window.location.reload()))
         }
     </script>
 </body>
