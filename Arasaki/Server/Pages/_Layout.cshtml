@@ -103,28 +103,6 @@
     <script type="text/javascript" src="/_framework/blazor.server.js" id="server-js-bootstrapper"></script>
     <script type="text/javascript" src="/bundle.min.js"></script>
     <script type="text/javascript">
-        function runPWA() 
-        {
-            navigator.serviceWorker.register('service-worker.js').then(reg =>
-            {
-                reg.onupdatefound = () =>
-                {
-                    console.log('[Arasaki SW]: Updated detected...')
-                    const installingWorker = reg.installing
-                    installingWorker.onstatechange = () =>
-                    {
-                        switch (installingWorker.state)
-                        {
-                            case 'installed':
-                                if (navigator.serviceWorker.controller) location.reload(true)
-                                break
-                        }
-                    }
-                }
-            }).catch(err => console.error('[Arasaki SW]: ' + err))
-        }
-    </script>
-    <script type="text/javascript">
         function setupAssembly(update = false) 
         {
             let wasmBootstrapper = document.getElementById('server-js-bootstrapper')
@@ -140,14 +118,25 @@
             window.history.pushState('', '', '/')
             document.body.appendChild(auth)
             document.body.appendChild(wasm)
-            runPWA()
+            navigator.serviceWorker.register('service-worker.js').then(reg =>
+            {
+                reg.onupdatefound = () =>
+                {
+                    const iw = reg.installing
+                    iw.onstatechange = () =>
+                    {
+                        switch (iw.state)
+                        {
+                            case 'installed':
+                                if (navigator.serviceWorker.controller) location.reload(true)
+                                break
+                        }
+                    }
+                }
+            }).catch(err => console.error(err))
         }
 
-        window.setupServer = () =>
-        {
-            navigator.serviceWorker.getRegistrations().then(registrations => { for (let registration of registrations) registration.unregister() })
-            caches.delete('/index.html').then(found => window.location.reload())
-        }
+        window.setupServer = () => caches.delete('index.html').then(found => window.location.reload())
     </script>
 </body>
 </html>
