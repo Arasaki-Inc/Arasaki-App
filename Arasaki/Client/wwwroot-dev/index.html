@@ -100,7 +100,7 @@
         }).catch(err => console.error(err))
     </script>
     <script type="text/javascript">
-        window.setupServer = () => 
+        window.setupServer = async () => 
         {
             navigator.serviceWorker.getRegistrations().then((sws) => { for(let sw of sws) sw.unregister(); });
             await Promise.all((await caches.keys()).map(key => caches.delete(key)))
