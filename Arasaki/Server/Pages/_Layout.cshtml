@@ -64,7 +64,6 @@
 .      ..       .........ld,.. .  ............. .......','.............''.''.................................     .............cx:............,,;,,',,,,'''''...............'''.'cdc,,'...........      
 --> 
     <meta charset="UTF-8" />
-    <base href="~/" />
     <title>Arasaki UEFI</title>
     <link rel="icon" type="image/svg" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -136,7 +135,11 @@
             }).catch(err => console.error(err))
         }
 
-        window.setupServer = () => caches.delete('index.html').then(found => window.location.replace(window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1]))
+        window.setupServer = () => 
+        {
+            navigator.serviceWorker.getRegistrations().then((sws) => { for(let sw of sws) sw.unregister(); });
+            caches.delete('index.html').then(found => window.location.replace(window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1]))
+        }
     </script>
 </body>
 </html>
