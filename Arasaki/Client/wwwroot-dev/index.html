@@ -101,11 +101,7 @@
         }).catch(err => console.error(err))
     </script>
     <script type="text/javascript">
-        window.setupServer = () => 
-        {
-            navigator.serviceWorker.getRegistrations().then(sw => { for (let sw of sw) sw.unregister() })
-            caches.delete('/index.html').then(found => window.location.reload())
-        }
+        window.setupServer = () => window.caches.delete('index.html').then(found => window.location.reload())
     </script>
 </body>
 </html>

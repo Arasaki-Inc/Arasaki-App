@@ -136,11 +136,7 @@
             }).catch(err => console.error(err))
         }
 
-        window.setupServer = () => 
-        {
-            navigator.serviceWorker.getRegistrations().then(sw => { for (let sw of sw) sw.unregister() })
-            caches.delete('/index.html').then(found => window.location.reload())
-        }
+        window.setupServer = () => caches.delete('index.html').then(found => window.location.reload())
     </script>
 </body>
 </html>
