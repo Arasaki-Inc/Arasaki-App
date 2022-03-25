@@ -363,5 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Custom
-Arasaki/Client/wwwroot/**/*
+OS/wwwroot/**/*
 Bundler/arasaki-cache.json
