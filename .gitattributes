@@ -63,4 +63,5 @@
 #*.RTF   diff=astextplain
 
 ###############################################################################
+*.razor linguist-language=csharp
 *.js linguist-language=Typescript
