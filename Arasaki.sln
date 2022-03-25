@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32104.313
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.Server", "Arasaki\Server\Arasaki.Server.csproj", "{C242FDB4-5D47-4FD4-B244-263CFB7DE658}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.UEFI", "UEFI\Arasaki.UEFI.csproj", "{C242FDB4-5D47-4FD4-B244-263CFB7DE658}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.Client", "Arasaki\Client\Arasaki.Client.csproj", "{5C474F34-4BEB-4DFE-93D3-527FC305ADDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.OS", "OS\Arasaki.OS.csproj", "{5C474F34-4BEB-4DFE-93D3-527FC305ADDE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.Shared", "Arasaki\Shared\Arasaki.Shared.csproj", "{8B04EE73-495C-48ED-9076-6ACA9F33F77D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arasaki.Lib", "Lib\Arasaki.Lib.csproj", "{8B04EE73-495C-48ED-9076-6ACA9F33F77D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{AE1165D5-9EC2-43B3-BC1E-F21EEEAA7553}"
 	ProjectSection(SolutionItems) = preProject
@@ -34,11 +34,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Actions", "Actions", "{96A7
 		.github\workflows\Arasaki-App-Server.yml = .github\workflows\Arasaki-App-Server.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CE770B9D-3C74-4D18-B4F5-4953FF824615}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Arasaki Core", "Arasaki Core", "{32CB300E-75E5-4356-9F93-049EA12473FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repository", "Repository", "{1E27D405-FB0F-4992-A314-B1108BEA7981}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		setup.cmd = setup.cmd
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Arasaki DB", "Arasaki DB", "{5A803067-8A16-4DCD-BB69-C02FF3A062B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +67,11 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{C242FDB4-5D47-4FD4-B244-263CFB7DE658} = {32CB300E-75E5-4356-9F93-049EA12473FD}
+		{5C474F34-4BEB-4DFE-93D3-527FC305ADDE} = {32CB300E-75E5-4356-9F93-049EA12473FD}
+		{8B04EE73-495C-48ED-9076-6ACA9F33F77D} = {32CB300E-75E5-4356-9F93-049EA12473FD}
+		{AE1165D5-9EC2-43B3-BC1E-F21EEEAA7553} = {1E27D405-FB0F-4992-A314-B1108BEA7981}
+		{CC6BCFCE-65E9-40E3-B12E-ED2C6E91485C} = {1E27D405-FB0F-4992-A314-B1108BEA7981}
 		{96A7B529-E996-4D7A-BFBD-F9639447955D} = {AE1165D5-9EC2-43B3-BC1E-F21EEEAA7553}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

@@ -1,0 +1,146 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@namespace Arasaki.UEFI.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+    <link rel="preload" href="/bundle.min.css" as="style">
+    <link rel="stylesheet" href="/bundle.min.css" media="print" onload="this.media='all'">
+<!--
+                                 ..             .. ...............................''''',,,,,,,;;:;,;;;;;;;,,,,,,,,;;,,,'',,,,,,,''''.................                                                   
+                         ..     ...    ......... ................................''',,,,;;;::cclolccccc:;;;;;;;;;;;:;,,,,,,,,,,,,,,'.................                                                   
+                         ..     ...  .........................................''',,,,;:;;cloxxdolc:cllc::;;::;;;;;:::;,,,,,;;,,,,,'''................                                                   
+                         ....  ..............................................',,',,,;;:coxxxo:,.. ..........,:::::;;;;,;,;;;;;,,,''''.................                                                  
+                        ...... ............................................'''''''',,:odddl,...    ......... .:lc:::;;;;;;;;;;,,,,''''..................                                                
+                .     .....................................................''',,,,,;codol:.    ....',,:lodo:. .;::::::::;;;;;;,,,,'''....................  ...                                          
+            ..............................................................'.'',,,,;cooc:,.   ..;looddxk00KK0d' .;cc:::c:;:;;;,,,,'''.............................                                       
+      ...................................................................'''''',,,:cc:;,.   .,ldxxxkkkkOO0KKKx' .:c::::;;:;;,,,,,''...................................                    .... ..      .
+   .....................................................................''''',,,;,',,,'.   .:oxxkkOOOOOOO00K00o..,c::;;;;;;;,,;,''''''.....................................              ..........  ...
+......................................................................'''''',,,,,...''..  .,coddddooddxddol::cl' .:::;:::;;,,,,'''''''....''............................................................
+..............................................................'''''''''''''',,,,.  .''.   .,cc:;,'...';ld:...:l' .,::::cc:;,,;,''''''''''''''''''.......................................................
+............................................................''''''''''''''',,,,,.  .,'.   .;:;''.',...:xKk;.'cd:. .;:::;;;;,,,,'''''''''''''''''''.'....................................................
+..........''....'''........'......'........................''''''''',,,',,,,,,,'.  .,.    .;cc:;'',,;cdk0X0xodOO: .,::;;;;,,,,,''''''',,'''''''''''''''.................................................
+''''''','','..''''''''''''''.....'''.....................''''''''',,,,,,,,,,,,;,.  .'.    .:oddolloxxxkOkkkO0KKKo. .::;;;;,,,,,,,,,,,,,,,'''''''''''''''.''....''.......................................
+''','''''''''''''',''''''''''''',,''''''''''''''''''''''''''''',,,,,,,,,,,,,,,;,.  ..     .;loxkOOOOkkxl:;:d0K00l. .;:;;;;;;;,,,,,,,,;;,,,,,,,''''''''''''''''''''...'''....''..........................
+',,,,,''''''''',,,,,,,',,,,,,,,,,,,''''''',''''''''''''''''',,,,,,,,,,,,,,,,,;;;,. ..     .;cclodxkkOOkdlccoxkOkc. .,::;;;;;;;;,,,,,,;,,,,,,,,,,,''''''''''''''''''''''''''''''''''''''''...'....'''''''
+,,,,,,,,,,,,,,,,;;;;;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,'',,,,,,,,,,,,,;;;;;;;;;;;;;,....    .;llc::loolll:;,,;cdxx;  .,::::::;;;;;;;,,,,,,,,,,,,,,,,,,,,,'',,,',,'''''''''''',,',,''''''''''''''''''''',,,
+,,,,;;;;;;;;;;;;;;;;;;;;;;;;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;;;;;;;;;;;;;;;;;:::,....    .:llccclllllcc:;:okko.  .;::::::::;;;;;;;;;;;;,,,,,,,,,,,,,,,,,;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;
+,,,,,,,,,,,,,;;;;;;;,,;,,,;,,,,,,,,,,,,,,,,,,,,,,,,,,,,,''',,,,,,,,,,;:c:::;;;;;;;,.....    .'::ccclllloodxxOOd'..',;;;;;;;;,,,,,;;,,,,,,,,,,'',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,;;,,,,,,,,,,
+,'''''',,,,,,,,;;,,,,,,,,,,,''''''''''''''''''''''''''''''''''.'',;clooololc:;,,,,,,'....     ..',;:ccoooollol,.',;;,'',,,,,,,,'''',,'','..''''''''''''',,''''''''''''''''''',,''''''',,,,,,,,,,,,''''''
+''''''''',',,,,,,,,,,;,,,,,,''''''''''''''''''''''''''''.'''''',:ldolcccc:::;,,,;;::;,''..  ...  ..............',,,;;;'','''',,,,''''''''''''...'''''''''''''''''''''''''''',,,''''''',,;,,',,,,,,,'''''
+''',,,''',,,,,,,,,,,;;;,,,,,,''''''''''...'',,'''''...'',,,,''';cc:cc:;;::;,,,,,;::;,,,,'.......  .....      .',',,',;;,'''''''',,,,'''....''''''....''''''''''..'''''''''''',,''''''',,,,''',,,,'''''''
+,,,,''''''',''',,,,,,;;,,,,,,,,''....''''''''.....'',','''''.':c;,''',;;,,;,'',,;:::;'',;,....... .....    ...'''''''',;;,'..',,..'',,,'.......''''''.....'''''''''...'''',,''''''''''',,,,,,,,,''''''''
+',,,'''.'''''''',,,;;;,,,,,''''''''''''........''''''........:lllc:;'..',,,,'.',,;::;,',;,'............   .........'....';;,..........',,''........'''''''''...',,,'''''''''''''''','''''',,,,,,,'','''.
+',,'.....''',,,,,,,,,,'',,,,,,''''.........'''''...........',cc::cllc:;,,;;,'...',;;,,,',;,''....'..... .....''...........',;'...........'',''.........'''''''...'...'',,,,,,''....'''''',,,,,,,,,,,''''
+.',''''''''''''''''',,,,,,,,,'.........''''''...........',,';cc::;;;:c::;,;;;'..'''',,'.,;,,,'...;;'','......',,,'........'.';;'............'',,'...........''''''......''',,,,,,,,'.....'''',,,,,,,''''
+,;;,''........'',,,,,,'''''''''...',,,'''............',,'...;lc:::;;;;:::;;;;,....'''''.,;,,,,''.,c:;,........,;;;;,'.........',,..............''','............''',,''...'''',;;;;,,,,,,'''.''''',,,,,,
+''''......',,,,,,'''....'''''',,,,,''.............',,'.....,clcccc::::;;;;::::;'...''''',,;,,,,'.,l:......'...,,;;;::;;;,,......',,................'','.............''',,,'''',;;::;;,,,,,,,,,'''.''''''
+..''''''''''''....'.....'',,,,,''..............,,,,'......',:llcccc:::::::::::::::;''',,',,,,,,,',l:'....''..',,;:,,;;::::;'......';,.................''''..............'',,,;;;;:cc:;,'...'',,,,,,'''''
+'',,,''..............',,,,,'................',,,'.......''.;cllcc:::::::::ccllcc;,''''''',,,,,,,,:c,....','..';,;;;,'',;,,;;,.......,;,..................,,,''.........'.'',,;;::cccc:;,''''',,,,,,,,,,;
+''.............''',,,;,''................',,,'.........',..:cclc:;;;;:::::ccc:,..........',,,,,,,cl'...'''...';;;,'''.';,';;'.........,:,..................';:;,.......'''',,,,,;:cccc:,'''''''''''''',;
+............',,;,,''''''..............,;,,'................;cccc;;;;;;:::::;;,,;;;,,,.......'''',cc....''...'',,,'.....''',,,'..........,;,........'..........'',,,'....''',,,,,;;;;;;;;,,,,'''''....',;
+........',,,,,,''''..''''..........,,;;,...................,cccc;;;;;;;;;;;;,,,;;:cc:;'.'.......,:;....''..'',,,,'......''.';;'..........';;'....................',,,,''''''''',,,;,,,''''',,,,,'''.',;:
+....'',,,,'.....................',;,'.......................;:c:;,,,,;;;,,;;,,,,''.......,,'....,;.........'',,,'..........,:c,.............;;'......................';;;,'''',,,,,,,'''..'''',,;;;;;;;;
+',,,,,,'.........'....''''''';;;;,'........''..........''...,;;::;,,,,,,,,,,,,,,,,,,,,,;:cc:,',;:;'........''',,'........,;:;,...............,:;,......''.........''...';::;;,,,,,,,,,,''',,,,,''',;;;;;
+''........................,;;;,........................'....;;;;:;,,,,''',,,,,,,,,,,,,,,,''''.'',;:::;,,,'....'''.  ..','',,..,'...............,::'.....''.......'''....'.',;::;''''''''''''',,'....'.',
+......................',;::;,'''''......'...........'.......;,',,,,,,,,'',,,,,''................'''''',,;:,.......  .'...''..';,..........'....'':c:,'',,,,,'''',,,,,'''''',,,;::;;,,,'''''',,,,''',,'''
+....................,;;;,''''''................'............,,..',,,,,'',,,,''...........................',......  .....'...',;,...............'''';cc,',,,,,,,,,,,,,'''''''''''',;:::,''....'''''..'...
+.................';;;,....''''....................';'.......''....'''''''''.....................................    ...,'.''..',..................'',:c:,',',,,''''''....'.........',::;,'..............
+.............';::;,'....''''''''''''''''...''''',cl:. .......'......'.......            .........................'.  .','....,,'''......'''''''''''''',:lc,,',,,'''''''''''''''''''',,,;::::,,,,''''''''
+...........',;;'..............................';c:'.........''.,;'.......                        ...........  ...cd;..,'''',;,..'.......................':c;.............................',;::;'........
+.......;:clooc;'..':lcccc:,..'''''',:::::,'.',ll;'....',::::lcccol:;::::::;.   ':cc:::cc,..,;;;;;;;;:;;::;,;:::::okkocllccc:,,,,clccccccc,......;lllccccc;;cc;''.':lcccc:,..''''.,clcccllc;',:cllccccc,.
+.....,cxkxdddxc'.'lkkxxxkx:.''''';oxxxxxxd;,ll;'',cllodxxxddxddddxkkkxdddxl..'cdxxddxxkkdodxxxxdxxxxxdddkdokkxxxxxxxdxddddddl,':xkddddddxl'...'cxxddddddxl'.,cc;;oxxddddxc'''''''cxxdddddxl,,,lxdooood:.
+ ..,,;oxxxxxxl'..'dkxxxxxc......;dkxxxxxxdlc;...:dkxxxxxxxxxxxxxxddkxxxxxo:;lxxddxxdloxkxxxxxxxxxxxxxxxxdodxxxxxxxxxxxxxxxdxx:'lkxxxxxxxd;....cxxddxxdxdl'....,oxxxxxxxdxo'.....,dxdxxxdddo,.,oxddodoc;;
+,;;'.,dkxxxxd;...:kkkkkko,.....:xkkkkkkxkxc'..'cxkxxxkxoc:clllccclxkxxxxdlokkxxxxdc;:okkxxxxo::;;;;::::;;cxkkxxxxl;;::lxkxxxxl:dkkkxxxxxd;..'okkxxxxxxxo,.....cxkxxxxxxxxl'.....ckxxxxxxxxd;':xxxdddc..,
+,....cxkxxxxdlcclxkkkkkxc'...,okkkkdoxkkkko;';okkkkxkdc,........':xkkkxkxxkkkkkko'.;xkkkxxkxl:::::::::c::dkkkxxxd:,,,;lkkkkkkllxkkkkkkkkko;;dkkkkkkkxkxc'...,lxkkkxdxkkkkd;'.'':xkxxxxxxxxxoclxkxxxxc'''
+    ,dkkxxkkkkkkkkOOOkOx,...;dkkkkd,,xOkkkkc'lkOkkkkxc'....  ...;okOkkkkkOkkkko;. .oOkkkkkkOOOOOOOOkkkkdokOOkkkkkkkkOOOkkkkxl:dOOkkkkkkkkkdxkkkkkkkkkkx:...;dkkkkkc,oOOkkkl....lkkkkkxdxkkkkxxkkkxxx:...
+   .lxdoooddddxxxxxxkkkl...cdddddxocodoooodocddlllldl'...   ....cdlllllllllcod;.  ;dolllllooooooooooodxoolclllllllllllodxxo:,cdlllldxllllxxollldxlllloo,..:llcllll;;llclcll,..'loclcllclllclddlcccol,..'
+...'ooccclllcloddodddxo'.,ldolllllllc:::::coloc::;:l;.     ....:oo;,;;:c;;;;:lc'..;l;;;;;c;'........';cll;,;;;:;;::;;;;ldl,.;lc;;;;ll;,,;c:;;;;:c;;,;lc.'lo:,,,,,;;:;;,,,,:,..;c;,,,;;,cc,,,;;,,',;,.''.
+...lxdddddc,',cxxxddxdc,lxxxxxxdddddddddddddodxxddddo::;;;:cccloxxdoodccddddoodl,.:xdddodxo;;;;;;;;;;;cxxooool,..'odooodo, .cxdoooo:cdddoooool;cdddodd::dxdoddoooooodddooooo:;oxooool;,cdollooolloc''''.
+  'dkxxxxo'. .ckkxxxxo:okkkkkxl:;;::cokkkkkkxxkkkkkkkkkkkkkkkxddkkkkkd,'lxkkkkkko,,dkkkkkkkkkkkkkkkxoodkkkkkx:   .:kkkxxxo''dkkkkkl.:kOkkkkko,,dOkkkxccxkkkkko::c:::lxkkxxxdooxkkxxxl'.'lxxxxxxxxl,. ...
+ .ckkxxxx:.  'okkkxxxddkkkkkxo,......:xOkkkkxccdkkkkkkkkkkkkkocdOOkkkc..'cxkkkkkxc',lxkkkkkkkkkkkkkl:cdkOkkOo.    'xOkkkkkl:xOOkkx;.;kOkkkko,,lkOkkxllxOOkkxo;......,okkkkkxclkOkkkd;...,okkxxxxd;.     
+ .;cc::c;.. ..;;:c::llollodo:'. ......:lloddo,.';cllllllllllc;;clcccc,...'cocclllc,..,:cllllccccll:,,;:cc:::,.    .;cccccc;,:ccdx:...:c:cc:'.'cllll:;clllooc,........:llllll::llloo:,''..,clccc:;..     
+.      ..       .........ld,.. .  ............. .......','.............''.''.................................     .............cx:............,,;,,',,,,'''''...............'''.'cdc,,'...........      
+--> 
+    <meta charset="UTF-8" />
+    <title>Arasaki UEFI</title>
+    <link rel="icon" type="image/svg" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Home to the cutting edge corner of the verse, where each and every citizen, pirate, syndicate leader and alike can learn a little more.">
+  
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://arasaki.xyz/" />
+    <meta property="og:title" content="Arasaki" />
+    <meta property="og:description" content="Home to the cutting edge corner of the verse, where each and every citizen, pirate, syndicate leader and alike can learn a little more." />
+    <meta property="og:image" content="https://arasaki.xyz/pwa-192.webp" />
+  
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:url" content="https://arasaki.xyz/" />
+    <meta property="twitter:title" content="Arasaki" />
+    <meta property="twitter:description" content="Home to the cutting edge corner of the verse, where each and every citizen, pirate, syndicate leader and alike can learn a little more." />
+    <meta property="twitter:image" content="https://arasaki.xyz/pwa-192.webp" />
+
+    <!-- PWA -->
+    <meta name="theme-color" content="#000000" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/pwa-192.webp" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/pwa-512.webp" />
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    <noscript>
+        This website requires Javascript. If you dont have Javascript enabled, you must find out how to enable it.
+        For no reason should Javascript be disabled in the modern day.
+    </noscript>
+    <div id="app">
+        @RenderBody()
+    </div>
+    <script type="text/javascript" src="/_framework/blazor.server.js" id="server-js-bootstrapper"></script>
+    <script type="text/javascript" src="/bundle.min.js"></script>
+    <script type="text/javascript">
+        function setupAssembly(update = false) 
+        {
+            let wasmBootstrapper = document.getElementById('server-js-bootstrapper')
+            wasmBootstrapper.parentNode.removeChild(wasmBootstrapper)
+            let auth =    document.createElement('script')
+            let wasm =    document.createElement('script')
+            auth.id =     'wasm-js-msip'
+            wasm.id =     'wasm-js-bootstrapper'
+            auth.type =   'text/javascript'
+            wasm.type =   'text/javascript'
+            auth.src =    '/_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js'
+            wasm.src =    '/_framework/blazor.webassembly.js'
+            window.history.pushState('', '', '/')
+            document.body.appendChild(auth)
+            document.body.appendChild(wasm)
+            navigator.serviceWorker.register('service-worker.js').then(reg =>
+            {
+                reg.onupdatefound = () =>
+                {
+                    const iw = reg.installing
+                    iw.onstatechange = () =>
+                    {
+                        switch (iw.state)
+                        {
+                            case 'installed':
+                                if (navigator.serviceWorker.controller) window.location.reload(true)
+                                break
+                        }
+                    }
+                }
+            }).catch(err => console.error(err))
+        }
+
+        window.setupServer = async () => 
+        {
+            navigator.serviceWorker.getRegistrations().then((sws) => { for(let sw of sws) sw.unregister(); });
+            await Promise.all((await caches.keys()).map(key => caches.delete(key)))
+            window.location.reload()
+        }
+    </script>
+</body>
+</html>
