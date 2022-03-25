@@ -324,7 +324,7 @@ async function processing(proc_dirname, proc_dirname_dev)
 
     process.title = __project_name + " Bundler"
 
-    const __client_dirname = join(__dirname, '../', __project_name, 'Client')
+    const __client_dirname = join(__dirname, '../', 'OS')
     const __client_wwwroot_dirname = join(__client_dirname, 'wwwroot')
     const __client_wwwrootdev_dirname = join(__client_dirname, 'wwwroot-dev')
     await processing(__client_wwwroot_dirname, __client_wwwrootdev_dirname)
