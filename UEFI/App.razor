@@ -21,12 +21,9 @@
 
 @code
 {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnParametersSetAsync()
     {
-        if (firstRender)
-        {
-            await JSInterop.InitialiseJSDotNetRuntimeReferences(JSRuntime, Services.Get<JSInterop.RuntimeInterop>(), "runtime");
-            await JSInterop.InitialiseJSDotNetRuntimeReferences(JSRuntime, Services.Get<JSInterop.UIInterop>(), "ui");
-        }
+        await JSInterop.InitialiseJSDotNetRuntimeReferences(JSRuntime, Services.Get<JSInterop.RuntimeInterop>(), "runtime");
+        await JSInterop.InitialiseJSDotNetRuntimeReferences(JSRuntime, Services.Get<JSInterop.UIInterop>(), "ui");
     }
 }

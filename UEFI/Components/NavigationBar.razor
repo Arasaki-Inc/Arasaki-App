@@ -8,7 +8,7 @@
         </div>
     </div>
 }
-@if (!IsMobileScreen || IsNavigationBarVisible)
+else if (!IsMobileScreen || IsNavigationBarVisible)
 {
     <div id="navigation-bar" class="container-fluid">
         <div class="row">
@@ -121,21 +121,11 @@
     private bool IsMobileScreen = true;
     private bool IsNavigationBarVisible = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        await base.OnInitializedAsync();
         Uri navURI = new(NavigationManager.Uri);
         SetPageContext(navURI.AbsolutePath);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            IsMobileScreen = await UIInterop.IsMobileScreen(JSRuntime);
-            if (!IsMobileScreen) await InvokeAsync(StateHasChanged);
-        }
+        IsMobileScreen = await UIInterop.IsMobileScreen(JSRuntime);
     }
 
     private void ToggleNavigationBar() => IsNavigationBarVisible = !IsNavigationBarVisible;
