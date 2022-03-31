@@ -21,50 +21,6 @@
 
 @code
 {
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-        Uri navURI = new(NavigationManager.Uri);
-        UIState.PageContexts = new()
-        {
-            new PageContext
-            {
-                PublicName = "Arasaki UEFI",
-                PrivateName = "uefi",
-                RelativeURLs = new() { "/uefi", "/" },
-                BackgroundRelativeURL = "/img/server/backgrounds/uefi.svg"
-            },
-            new PageContext
-            {
-                PublicName = "App Settings",
-                PrivateName = "settings",
-                RelativeURLs = new() { "/uefi/settings" },
-                BackgroundRelativeURL = "/img/server/backgrounds/settings.svg"
-            },
-            new PageContext
-            {
-                PublicName = "Permissions",
-                PrivateName = "permissions",
-                RelativeURLs = new() { "/uefi/perms" },
-                BackgroundRelativeURL = "/img/server/backgrounds/permissions.svg"
-            },
-            new PageContext
-            {
-                PublicName = "Changelog",
-                PrivateName = "changelog",
-                RelativeURLs = new() { "/uefi/changelog" },
-                BackgroundRelativeURL = "/img/server/backgrounds/changelog.svg"
-            },
-            new PageContext
-            {
-                PublicName = "About",
-                PrivateName = "about",
-                RelativeURLs = new() { "/uefi/about" },
-                BackgroundRelativeURL = "/img/server/backgrounds/about.svg"
-            }
-        };
-    }
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
