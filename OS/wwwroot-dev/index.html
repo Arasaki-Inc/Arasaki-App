@@ -59,6 +59,7 @@
 --> 
     <meta charset="UTF-8" />
     <title>Arasaki</title>
+    <base href="~/" />
     <link rel="icon" type="image/svg" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
   
@@ -81,31 +82,5 @@
     <script type="text/javascript" src="/_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
     <script type="text/javascript" src="/_framework/blazor.webassembly.js"></script>
     <script type="text/javascript" src="/bundle.min.js"></script>
-    <script type="text/javascript">
-        navigator.serviceWorker.register('service-worker.js').then(reg =>
-        {
-            reg.onupdatefound = () =>
-            {
-                const iw = reg.installing
-                iw.onstatechange = () =>
-                {
-                    switch (iw.state)
-                    {
-                        case 'installed':
-                            if (navigator.serviceWorker.controller) window.location.reload(true)
-                            break
-                    }
-                }
-            }
-        }).catch(err => console.error(err))
-    </script>
-    <script type="text/javascript">
-        window.setupServer = async () => 
-        {
-            navigator.serviceWorker.getRegistrations().then((sws) => { for(let sw of sws) sw.unregister(); });
-            await Promise.all((await caches.keys()).map(key => caches.delete(key)))
-            window.location.reload()
-        }
-    </script>
 </body>
 </html>

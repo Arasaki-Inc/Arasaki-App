@@ -55,6 +55,20 @@ else
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 app.UseRouting();
+WebSocketOptions webSocketOptions = new WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromMinutes(2)
+};
+
+#if DEBUG
+webSocketOptions.AllowedOrigins.Add("https://localhost:7107");
+webSocketOptions.AllowedOrigins.Add("https://www.localhost:7107");
+#else
+webSocketOptions.AllowedOrigins.Add("https://arasaki.xyz");
+webSocketOptions.AllowedOrigins.Add("https://www.arasaki.xyz");
+#endif
+
+app.UseWebSockets(webSocketOptions);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseResponseCaching();

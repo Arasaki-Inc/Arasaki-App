@@ -90,7 +90,7 @@
     <link rel="apple-touch-icon" sizes="192x192" href="/pwa-192.webp" />
     <link rel="apple-touch-icon" sizes="512x512" href="/pwa-512.webp" />
 
-    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+    <component type="typeof(HeadOutlet)" render-mode="Server" />
 </head>
 <body>
     <noscript>
@@ -102,46 +102,5 @@
     </div>
     <script type="text/javascript" src="/_framework/blazor.server.js" id="server-js-bootstrapper"></script>
     <script type="text/javascript" src="/bundle.min.js"></script>
-    <script type="text/javascript">
-        function setupAssembly(update = false) 
-        {
-            let wasmBootstrapper = document.getElementById('server-js-bootstrapper')
-            wasmBootstrapper.parentNode.removeChild(wasmBootstrapper)
-            let auth =    document.createElement('script')
-            let wasm =    document.createElement('script')
-            auth.id =     'wasm-js-msip'
-            wasm.id =     'wasm-js-bootstrapper'
-            auth.type =   'text/javascript'
-            wasm.type =   'text/javascript'
-            auth.src =    '/_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js'
-            wasm.src =    '/_framework/blazor.webassembly.js'
-            window.history.pushState('', '', '/')
-            document.body.appendChild(auth)
-            document.body.appendChild(wasm)
-            navigator.serviceWorker.register('service-worker.js').then(reg =>
-            {
-                reg.onupdatefound = () =>
-                {
-                    const iw = reg.installing
-                    iw.onstatechange = () =>
-                    {
-                        switch (iw.state)
-                        {
-                            case 'installed':
-                                if (navigator.serviceWorker.controller) window.location.reload(true)
-                                break
-                        }
-                    }
-                }
-            }).catch(err => console.error(err))
-        }
-
-        window.setupServer = async () => 
-        {
-            navigator.serviceWorker.getRegistrations().then((sws) => { for(let sw of sws) sw.unregister(); });
-            await Promise.all((await caches.keys()).map(key => caches.delete(key)))
-            window.location.reload()
-        }
-    </script>
 </body>
 </html>

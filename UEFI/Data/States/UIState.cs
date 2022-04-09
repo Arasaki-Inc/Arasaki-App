@@ -14,6 +14,13 @@ public class UIState
                 },
                 new PageContext
                 {
+                    PublicName = "Update",
+                    PrivateName = "update",
+                    RelativeURLs = new() { "/uefi/update" },
+                    BackgroundRelativeURL = "/img/server/backgrounds/update.svg"
+                },
+                new PageContext
+                {
                     PublicName = "App Settings",
                     PrivateName = "settings",
                     RelativeURLs = new() { "/uefi/settings" },
@@ -21,17 +28,17 @@ public class UIState
                 },
                 new PageContext
                 {
-                    PublicName = "Permissions",
+                    PublicName = "App Permissions",
                     PrivateName = "permissions",
                     RelativeURLs = new() { "/uefi/perms" },
                     BackgroundRelativeURL = "/img/server/backgrounds/permissions.svg"
                 },
                 new PageContext
                 {
-                    PublicName = "Changelog",
-                    PrivateName = "changelog",
-                    RelativeURLs = new() { "/uefi/changelog" },
-                    BackgroundRelativeURL = "/img/server/backgrounds/changelog.svg"
+                    PublicName = "App Maintenance",
+                    PrivateName = "maintenance",
+                    RelativeURLs = new() { "/uefi/maintenance" },
+                    BackgroundRelativeURL = "/img/server/backgrounds/maintenance.svg"
                 },
                 new PageContext
                 {

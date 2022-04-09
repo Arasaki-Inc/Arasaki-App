@@ -1,14 +1,14 @@
 ﻿@if (IsMobileScreen)
 {
-    <div id="navigation-bar-toggle-button-wrapper" class="@(IsNavigationBarVisible ? "container-fluid active" : "container-fluid")" @onclick="ToggleNavigationBar">
+    <div id="navigation-bar-toggle-button-wrapper" class="@(IsNavigationBarVisible ? "container-fluid active" : "container-fluid")" @onclick="@(() => IsNavigationBarVisible = !IsNavigationBarVisible)">
         <div class="row justify-content-center align-items-center">
             <div class="col-auto">
-                <div id="navigation-bar-toggle-button"><i class="fas fa-bars"></i></div>
+                <div id="navigation-bar-toggle-button"><i class="fa-solid fa-bars"></i></div>
             </div>
         </div>
     </div>
 }
-else if (!IsMobileScreen || IsNavigationBarVisible)
+@if (IsNavigationBarVisible)
 {
     <div id="navigation-bar" class="container-fluid">
         <div class="row">
@@ -30,19 +30,36 @@ else if (!IsMobileScreen || IsNavigationBarVisible)
                         </div>
                     </div>
                 </NavLink>
+                <NavLink class="row" href="/uefi/update" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/update"))">
+                    <div class="col">
+                        @if (!IsMobileScreen)
+                        {
+                            <div class="row justify-content-center">
+                                <div class="col-auto">
+                                    <i class="fa-solid fa-cloud"></i>
+                                </div>
+                            </div>
+                        }
+                        <div class="row">
+                            <div class="col">
+                                <p>OS Update</p>
+                            </div>
+                        </div>
+                    </div>
+                </NavLink>
                 <NavLink class="row" href="/uefi/settings" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/settings"))">
                     <div class="col">
                         @if (!IsMobileScreen)
                         {
                             <div class="row justify-content-center">
                                 <div class="col-auto">
-                                    <i class="fas fa-cog"></i>
+                                    <i class="fa-solid fa-cog"></i>
                                 </div>
                             </div>
                         }
                         <div class="row">
                             <div class="col">
-                                <p>App Settings</p>
+                                <p>OS Settings</p>
                             </div>
                         </div>
                     </div>
@@ -53,30 +70,30 @@ else if (!IsMobileScreen || IsNavigationBarVisible)
                         {
                             <div class="row justify-content-center">
                                 <div class="col-auto">
-                                    <i class="fas fa-bell"></i>
+                                    <i class="fa-solid fa-bell"></i>
                                 </div>
                             </div>
                         }
                         <div class="row">
                             <div class="col">
-                                <p>Permissions</p>
+                                <p>OS Permissions</p>
                             </div>
                         </div>
                     </div>
                 </NavLink>
-                <NavLink class="row" href="/uefi/changelog" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/changelog"))">
+                <NavLink class="row" href="/uefi/maintenance" Match="NavLinkMatch.All" @onclick="@(() => SetPageContext("/uefi/maintenance"))">
                     <div class="col">
                         @if (!IsMobileScreen)
                         {
                             <div class="row justify-content-center">
                                 <div class="col-auto">
-                                    <i class="fas fa-wrench"></i>
+                                    <i class="fa-solid fa-wrench"></i>
                                 </div>
                             </div>
                         }
                         <div class="row">
                             <div class="col">
-                                <p>Changelog</p>
+                                <p>OS Maintenance</p>
                             </div>
                         </div>
                     </div>
@@ -87,7 +104,7 @@ else if (!IsMobileScreen || IsNavigationBarVisible)
                         {
                             <div class="row justify-content-center">
                                 <div class="col-auto">
-                                    <i class="fas fa-info"></i>
+                                    <i class="fa-solid fa-info"></i>
                                 </div>
                             </div>
                         }
@@ -110,7 +127,6 @@ else if (!IsMobileScreen || IsNavigationBarVisible)
 }
 
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JSRuntime
 @inject JSInterop.UIInterop UIInterop
 @inject UIState UIState
 
@@ -125,10 +141,9 @@ else if (!IsMobileScreen || IsNavigationBarVisible)
     {
         Uri navURI = new(NavigationManager.Uri);
         SetPageContext(navURI.AbsolutePath);
-        IsMobileScreen = await UIInterop.IsMobileScreen(JSRuntime);
+        IsMobileScreen = await UIInterop.IsMobileScreen();
+        IsNavigationBarVisible = !IsMobileScreen;
     }
-
-    private void ToggleNavigationBar() => IsNavigationBarVisible = !IsNavigationBarVisible;
 
     private void SetPageContext(string relativeURL)
     {
@@ -136,7 +151,7 @@ else if (!IsMobileScreen || IsNavigationBarVisible)
         {
             UIState.CurrentPageContext = UIState.PageContexts.First(x => x.RelativeURLs.Contains(relativeURL));
             IsSpecialActive = UIState.CurrentPageContext.RelativeURLs[0] == "/uefi";
-            IsNavigationBarVisible = false;
+            if (IsMobileScreen) IsNavigationBarVisible = false;
         }
     }
 }

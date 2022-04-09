@@ -1,19 +1,23 @@
-﻿namespace Arasaki.UEFI.Data;
+﻿using Microsoft.JSInterop;
 
-using Microsoft.JSInterop;
+namespace Arasaki.UEFI.Data;
 
 public class JSInterop
 {
-    public async Task InitialiseJSDotNetRuntimeReferences<T>(IJSRuntime jsr, T tiedObject, string functionName) where T : class => await jsr.InvokeVoidAsync("GLOBAL." + functionName, DotNetObjectReference.Create(tiedObject));
+    public static IJSRuntime JSR { get; private set; }
+
+    public void SetJSRuntime(IJSRuntime runtime) => JSR = runtime;
 
     public class RuntimeInterop
     {
-        public async Task UpdateApp(IJSRuntime jsr) => await jsr.InvokeVoidAsync("runtime.updateApp");
+        public async Task SetupPWA() => await JSR.InvokeVoidAsync("runtime.common.setupPWA");
+        public async Task ListenForUpdate() => await JSR.InvokeVoidAsync("runtime.common.listenForUpdate");
+        public async Task SetupAssembly() => await JSR.InvokeVoidAsync("runtime.uefi.setupAssembly");
     }
 
     public class UIInterop
     {
-        public async Task<bool> IsMobileScreen(IJSRuntime jsr) => await jsr.InvokeAsync<bool>("ui.isMobileScreen");
-        public async Task<bool> IsTabletScreen(IJSRuntime jsr) => await jsr.InvokeAsync<bool>("ui.isTabletScreen");
+        public async Task<bool> IsMobileScreen() => await JSR.InvokeAsync<bool>("ui.common.isMobileScreen");
+        public async Task<bool> IsTabletScreen() => await JSR.InvokeAsync<bool>("ui.common.isTabletScreen");
     }
 }

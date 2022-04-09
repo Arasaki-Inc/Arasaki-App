@@ -1,0 +1,5 @@
+name: Arasaki
+dev_dependencies:
+  sass: ^1.49.10
+environment:
+  sdk: '>=2.10.0 <3.0.0'

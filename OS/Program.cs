@@ -1,5 +1,8 @@
-﻿using Arasaki.OS;
+﻿using System.Net.WebSockets;
+using Arasaki.OS;
+using Arasaki.OS.Data;
 using Arasaki.OS.Data.Authentication;
+using Arasaki.Sockets;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
@@ -25,6 +28,9 @@ builder.Services.AddAuthorizationCore(o =>
     o.AddPolicy("UserIsAdmin", policy => policy.Requirements.Add(new UserGroupsRequirement(new string[] { "Admins" })));
 });
 builder.Services.AddSingleton<IAuthorizationHandler, UserGroupsHandler>();
+builder.Services.AddSingleton<JSInterop>();
+builder.Services.AddSingleton<JSInterop.RuntimeInterop>();
+builder.Services.AddSingleton<ArasakiSocket<ClientWebSocket>>(new ArasakiSocket<ClientWebSocket>(new ClientWebSocket()));
 host = builder.Build();
 Services.SetServiceProvider(host.Services);
 await host.RunAsync();

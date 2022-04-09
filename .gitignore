@@ -365,3 +365,4 @@ FodyWeavers.xsd
 # Custom
 OS/wwwroot/**/*
 Bundler/arasaki-cache.json
+Bundler/.dart_tool/**/*

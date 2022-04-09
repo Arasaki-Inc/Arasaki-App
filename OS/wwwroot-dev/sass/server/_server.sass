@@ -6,15 +6,14 @@
 @import "pages/uefi"
 @import "pages/settings"
 @import "pages/permissions"
-@import "pages/storage"
-@import "pages/updater"
+@import "pages/maintenance"
 @import "pages/about"
 
 .page
     z-index: $server_zIndexPageContainer
     .text-block
         backdrop-filter: $backdropBlurHigh
-        background-color: $themeRedDarkerTransparencyHigh
+        background-color: $themeBlackTransparencyHigh
         padding: #{$cornerClipSizeLarge}px
         clip-path: polygon(0px #{$cornerClipSizeLarge}px, #{$cornerClipSizeLarge}px 0px, 100% 0px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
         margin-top: 18px
@@ -24,7 +23,7 @@
         h1
             margin-top: 6px
         i
-            color: black
+            color: $themeBlack
 @include media-breakpoint-up(sm) // [768px] Larger Than Small
 @include media-breakpoint-up(md) // [992px] Larger Than Medium
     .page

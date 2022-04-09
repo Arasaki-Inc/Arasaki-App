@@ -14,16 +14,13 @@
 <NavigationBar />
 <Footer />
 
-@inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject JSInterop JSInterop
-@inject UIState UIState
 
 @code
 {
     protected override async Task OnParametersSetAsync()
     {
-        await JSInterop.InitialiseJSDotNetRuntimeReferences(JSRuntime, Services.Get<JSInterop.RuntimeInterop>(), "runtime");
-        await JSInterop.InitialiseJSDotNetRuntimeReferences(JSRuntime, Services.Get<JSInterop.UIInterop>(), "ui");
+        JSInterop.SetJSRuntime(JSRuntime);
     }
 }

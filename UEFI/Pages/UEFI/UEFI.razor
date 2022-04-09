@@ -39,28 +39,16 @@
         {
             <div class="row">
                 <div class="col">
-                    <div id="setup-button" onclick="setupAssembly()">Start Here</div>
+                    <div id="setup-button" @onclick="@(() => RuntimeInterop.SetupAssembly())">Start Here</div>
                 </div>
             </div>
         }
         <div class="row justify-content-begin">
             <div class="col-md-5 col text-block">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-exclamation-triangle" style="font-size:50px;"></i>
-                    </div>
-                    <div class="col">
-                        <p>
-                            The setup process will only take at most 2 minutes, it is highly recommended that you look at the options provided throughout
-                            ESPECIALLY on devices which use a battery and/or mobile data!
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row justify-content-begin">
-            <div class="col-md-5 col text-block">
                 <h1>Welcome To Arasaki</h1>
+                <h5>
+                    Home to the cutting edge corner of the verse, where each and every citizen, pirate, syndicate leader and alike can learn a little more.
+                </h5>
                 <hr />
                 <p>
                     The Arasaki UEFI is a ways and means of setting up your app experience as well as changing things at any other time,
@@ -73,10 +61,7 @@
                 </p>
                 <hr />
                 <p>
-                    Home to the cutting edge corner of the verse, where each and every citizen, pirate, syndicate leader and alike can learn a little more.
-                </p>
-                <p>
-                    The Arasaki App is a tool for Star Citizen to help you detrmine the best armour for your needs, the most suitable sustainance
+                    Arasaki OS is a tool for Star Citizen to help you detrmine the best armour for your needs, the most suitable sustainance
                     for that big mission, your next luxury yacht but, thats not all. Arasaki contains a database of the Verse as it is, cataloging
                     every planetary/celestial body, space station and more right at your fingertips.
                 </p>
@@ -84,14 +69,29 @@
             @if (!IsMobileScreen)
             {
                 <div class="col-auto">
-                    <div id="setup-button" onclick="setupAssembly()">Start Here</div>
+                    <div id="setup-button" @onclick="@(() => RuntimeInterop.SetupAssembly())">Start Here</div>
                 </div>
             }
+        </div>
+        <div class="row justify-content-begin">
+            <div class="col-md-5 col text-block">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <i id="alert" class="fa-solid fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="col">
+                        <p>
+                            It is highly recommended that you look at the options provided throughout
+                            ESPECIALLY on devices which use a battery and/or mobile data and/or limited bandwidth (also refered to mobile data limits)!
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-@inject IJSRuntime JSRuntime
+@inject JSInterop.RuntimeInterop RuntimeInterop
 @inject JSInterop.UIInterop UIInterop
 
 @code
@@ -102,7 +102,7 @@
     {
         if (firstRender)
         {
-            IsMobileScreen = await UIInterop.IsMobileScreen(JSRuntime);
+            IsMobileScreen = await UIInterop.IsMobileScreen();
             if (!IsMobileScreen) await InvokeAsync(StateHasChanged);
         }
     }

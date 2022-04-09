@@ -24,13 +24,16 @@
     </Router>
 </CascadingAuthenticationState>
 
-@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject JSInterop JSInterop
+@inject ArasakiSocket<ClientWebSocket> Socket
 
 @code
 {
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        await base.OnInitializedAsync();
-        Uri navURI = new(NavigationManager.Uri);
+        JSInterop.SetJSRuntime(JSRuntime);
+        await Socket.Connect();
+        await Socket.Send(new JsonUpdateSize { Size = 123456 });
     }
 }

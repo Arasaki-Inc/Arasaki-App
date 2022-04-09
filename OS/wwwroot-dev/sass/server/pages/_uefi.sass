@@ -1,17 +1,24 @@
 #uefi.page
+    #logo
+        filter: invert(1)
     .uefi
         color: $themeRedNormal
         text-align: left
+    #alert
+        color: $themeWhite
+        font-size: 50px
     #setup-button
         text-align: center
         padding: 30px 50px
         font-size: 30px
         clip-path: polygon(0px #{$cornerClipSizeLarge}px, #{$cornerClipSizeLarge}px 0px, 100% 0px, 100% calc(100% - #{$cornerClipSizeLarge}px), calc(100% - #{$cornerClipSizeLarge}px) 100%, 0px 100%)
         backdrop-filter: $backdropBlurHigh
-        background-color: $themeRedDarkerTransparencyHigh
+        background-color: $themeBlackTransparencyHigh
         cursor: pointer
         &:hover
-            background-color: $themeRedDarkestTransparencyLow
+            background-color: $themeBlackTransparencyLow
+    h5
+        font-weight: normal
 @include media-breakpoint-up(sm) // [768px] Larger Than Small
 @include media-breakpoint-up(md) // [992px] Larger Than Medium
     #uefi.page

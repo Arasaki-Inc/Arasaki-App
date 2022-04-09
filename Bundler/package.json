@@ -22,16 +22,15 @@
   "dependencies": {
     "@squoosh/lib": "^0.4.0",
     "await-exec": "github:hanford/await-exec",
-    "chokidar": "^3.5.2",
+    "chokidar": "^3.5.3",
     "command-exists": "^1.2.9",
-    "ffmpeg-static": "^4.4.0",
+    "ffmpeg-static": "^5.0.0",
     "get-folder-size": "^3.1.0",
     "p-limit": "^4.0.0",
-    "sass": "^1.32.13",
-    "terser": "^5.10.0",
+    "terser": "^5.12.1",
     "ttf2woff2": "^4.0.4"
   },
   "devDependencies": {
-    "typescript": "^4.6.0-dev.20220210"
+    "typescript": "^4.6.3"
   }
 }
