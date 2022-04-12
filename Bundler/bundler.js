@@ -1,4 +1,4 @@
-import { join } from 'path';
+import path, { join } from 'path';
 import { readFile, stat, truncate, writeFile } from 'fs/promises';
 import process from 'process';
 import crypto from 'crypto';
@@ -8,7 +8,7 @@ import getFolderSize from 'get-folder-size';
 import pLimit from 'p-limit';
 
 import { convertTTFtoWOFF2, minifySass, minifyTypescript, resetCompilationVariables, runSimpleCopy, transcodeH264ToAV1, transcodePNGToWebP } from './bundler_processors.js';
-import { fileExists, filterFiles, findFiles, __client_wwwrootdev_dirname, __client_wwwroot_dirname, __dirname } from './bundler_utils.js';
+import { fileExists, filterFiles, findFiles, __client_dirname, __client_wwwrootdev_dirname, __client_wwwroot_dirname, __dirname, __project_dirname } from './bundler_utils.js';
 
 const limit = pLimit(1);
 
@@ -152,15 +152,19 @@ async function createManifest(__client_wwwroot_dirname)
 
     if (isDebug)
     {
-        chokidar.watch(__client_wwwrootdev_dirname, { awaitWriteFinish: true, ignores: 'node_modules' }).on('change', async () =>
+        chokidar.watch(__project_dirname, { awaitWriteFinish: true }).on('change', async (event, path) =>
         {
-            if (clearOnUpdate)
+            if ([`${sep}UEFI${sep}`, `${sep}OS${sep}`].some(x => path.includes(x)) &&
+               ![`${sep}bin${sep}`, `${sep}obj${sep}`, `${sep}Properties${sep}`, `${sep}wwwroot${sep}` ].some(x => path.includes(x)))
             {
-                console.clear();
-                console.log(__project_introduction);
+                if (clearOnUpdate)
+                {
+                    console.clear();
+                    console.log(__project_introduction);
+                }
+                await processing(__client_wwwroot_dirname, __client_wwwrootdev_dirname);
+                await createManifest(__client_wwwroot_dirname);
             }
-            await processing(__client_wwwroot_dirname, __client_wwwrootdev_dirname);
-            await createManifest(__client_wwwroot_dirname);
         });
     }
 })()

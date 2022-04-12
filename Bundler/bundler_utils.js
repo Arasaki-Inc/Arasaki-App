@@ -4,8 +4,10 @@ import { join, resolve, sep } from 'path';
 
 export const __dirname = resolve();
 
-export const __server_dirname = join(__dirname, '../', 'UEFI');
-export const __client_dirname = join(__dirname, '../', 'OS');
+export const __project_dirname = join(__dirname, '../');
+export const __server_dirname = join(__project_dirname, 'UEFI');
+export const __client_dirname = join(__project_dirname, 'OS');
+
 export const __client_wwwroot_dirname = join(__client_dirname, 'wwwroot');
 export const __client_wwwrootdev_dirname = join(__client_dirname, 'wwwroot-dev');
 
