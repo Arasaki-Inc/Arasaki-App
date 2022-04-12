@@ -24,6 +24,7 @@ builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceO
 #endif
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAdB2C"));
 builder.Services.AddControllersWithViews();
+builder.Services.AddAntiforgery();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddResponseCaching();
