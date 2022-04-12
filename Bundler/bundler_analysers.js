@@ -8,7 +8,7 @@ export async function analyse_css(outputCss)
     var minified = '';
     var usedSelectors = [];
     const files = (await findFiles(__client_dirname)).concat(await findFiles(__server_dirname));
-    await Promise.all(files.filter(x => extname(x.name) == '.razor' || extname(x.name) == '.html').map(async item => 
+    await Promise.all(files.filter(x => extname(x.name) == '.razor' || extname(x.name) == '.html' || extname(x.name) == '.cshtml')).map(async item => 
     {
         if (item.name == '_Imports.razor' || item.path.includes(`${sep}bin${sep}`) || 
             item.path.includes(`${sep}obj${sep}`) || item.path.includes(`${sep}node_modules${sep}`) || 
