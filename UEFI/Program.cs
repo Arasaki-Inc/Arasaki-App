@@ -31,6 +31,7 @@ builder.Services.AddResponseCompression(options =>
 {
     options.Providers.Add<BrotliCompressionProvider>();
     options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "image/svg+xml" });
+    options.EnableForHttps = true;
 });
 builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.SmallestSize);
 
@@ -68,11 +69,11 @@ webSocketOptions.AllowedOrigins.Add("https://arasaki.xyz");
 webSocketOptions.AllowedOrigins.Add("https://www.arasaki.xyz");
 #endif
 
+app.UseResponseCaching();
+app.UseResponseCompression();
 app.UseWebSockets(webSocketOptions);
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseResponseCaching();
-app.UseResponseCompression();
 app.MapRazorPages();
 app.MapControllers();
 app.MapBlazorHub();
