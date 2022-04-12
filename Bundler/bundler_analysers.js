@@ -3,12 +3,6 @@ import { extname, sep } from 'path';
 
 import { findFiles, isEmptyOrSpaces, isUpperCase, __client_dirname, __server_dirname, __special_characters_regex } from './bundler_utils.js';
 
-function parseAttribute(line, attribute) 
-{
-    const parse = line.slice(line.indexOf(attribute) + attribute.length + 1);
-    return parse.substring(0, parse.indexOf('"'));
-}
-
 export async function analyse_css(outputCss) 
 {
     var minified = '';
@@ -156,7 +150,12 @@ export async function analyse_css(outputCss)
                                                                                                                    || ((line.includes(` ${x}:`) || line.includes(`${x}:`)) && !line.includes(`-${x}:`))
                                                                                                                     
                                                                                                                     :*/ line.startsWith(x) && !line.startsWith(`${x}-`));}
-
+    function parseAttribute(line, attribute) 
+    {
+        const parse = line.slice(line.indexOf(attribute) + attribute.length + 1);
+        return parse.substring(0, parse.indexOf('"'));
+    }
+    
     minifiedLines.forEach(line => minified += `${line.replace(': ', ':')}`);
     return minified;
 }
