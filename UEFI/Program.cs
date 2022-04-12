@@ -40,6 +40,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAntiforgery();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+#if !DEBUG
 builder.Services.AddResponseCaching();
 builder.Services.AddResponseCompression(o =>
 {
@@ -47,6 +48,7 @@ builder.Services.AddResponseCompression(o =>
     o.Providers.Add<BrotliCompressionProvider>();
     o.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "image/svg+xml"});
 });
+#endif
 builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Optimal);
 
 builder.Services.AddSingleton<JSInterop>();
@@ -83,8 +85,10 @@ webSocketOptions.AllowedOrigins.Add("https://arasaki.xyz");
 webSocketOptions.AllowedOrigins.Add("https://www.arasaki.xyz");
 #endif
 
+#if !DEBUG
 app.UseResponseCaching();
 app.UseResponseCompression();
+#endif
 app.UseWebSockets(webSocketOptions);
 app.UseAuthentication();
 app.UseAuthorization();
