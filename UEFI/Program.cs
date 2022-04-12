@@ -4,6 +4,7 @@ using Arasaki.UEFI.Data.States;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Identity.Web;
 using Serilog;
 
@@ -16,6 +17,18 @@ if (string.IsNullOrWhiteSpace(builder.Environment.WebRootPath)) builder.Environm
 builder.WebHost.UseKestrel(o =>
 {
     o.AddServerHeader = false;
+});
+builder.WebHost.ConfigureKestrel(o => 
+{
+#if DEBUG
+    o.ListenAnyIP(7107, lo =>
+#else
+    o.ListenAnyIP(8080, lo =>
+#endif
+    {
+        lo.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+        lo.UseHttps();
+    });
 });
 #if DEBUG
 builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions { ConnectionString = "00000000-0000-0000-0000-000000000000" });
@@ -79,5 +92,4 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-if (Runtime.IsDevelopmentMode) await app.RunAsync("https://0.0.0.0:7107");
-else await app.RunAsync();
+await app.RunAsync();
