@@ -45,7 +45,6 @@ export async function analyse_css(outputCss)
             });
         }
     }));
-    usedSelectors.push('.active');
     
     var minified = '';
     var minifiedLines = [];
@@ -155,7 +154,7 @@ export async function analyse_css(outputCss)
         const parse = line.slice(line.indexOf(attribute) + attribute.length + 1);
         return parse.substring(0, parse.indexOf('"'));
     }
-    
+
     minifiedLines.forEach(line => minified += `${line.replace(': ', ':')}`);
     return minified;
 }
