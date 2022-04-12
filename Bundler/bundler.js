@@ -1,4 +1,4 @@
-import path, { join } from 'path';
+import { join, sep } from 'path';
 import { readFile, stat, truncate, writeFile } from 'fs/promises';
 import process from 'process';
 import crypto from 'crypto';
@@ -152,10 +152,11 @@ async function createManifest(__client_wwwroot_dirname)
 
     if (isDebug)
     {
-        chokidar.watch(__project_dirname, { awaitWriteFinish: true }).on('change', async (event, path) =>
+        chokidar.watch(__project_dirname, { awaitWriteFinish: true }).on('change', async (e, p) =>
         {
-            if ([`${sep}UEFI${sep}`, `${sep}OS${sep}`].some(x => path.includes(x)) &&
-               ![`${sep}bin${sep}`, `${sep}obj${sep}`, `${sep}Properties${sep}`, `${sep}wwwroot${sep}` ].some(x => path.includes(x)))
+            const strp = String(p);
+            if ([`${sep}UEFI${sep}`, `${sep}OS${sep}`].some(x => strp.includes(x)) &&
+               ![`${sep}bin${sep}`, `${sep}obj${sep}`, `${sep}Properties${sep}`, `${sep}wwwroot${sep}` ].some(x => strp.includes(x)))
             {
                 if (clearOnUpdate)
                 {
