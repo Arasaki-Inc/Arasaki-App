@@ -28,13 +28,13 @@ builder.Services.AddAntiforgery();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddResponseCaching();
-builder.Services.AddResponseCompression(options =>
+builder.Services.AddResponseCompression(o =>
 {
-    options.Providers.Add<BrotliCompressionProvider>();
-    options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "image/svg+xml" });
-    options.EnableForHttps = true;
+    o.EnableForHttps = true;
+    o.Providers.Add<BrotliCompressionProvider>();
+    o.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "image/svg+xml"});
 });
-builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.SmallestSize);
+builder.Services.Configure<BrotliCompressionProviderOptions>(o => o.Level = CompressionLevel.Optimal);
 
 builder.Services.AddSingleton<JSInterop>();
 builder.Services.AddSingleton<JSInterop.RuntimeInterop>();
