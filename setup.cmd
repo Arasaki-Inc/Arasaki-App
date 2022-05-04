@@ -1,7 +1,4 @@
 @echo off
-cd "Bundler"
-start cmd /c npm i
-start cmd dart pub get
 cd "..\OS\wwwroot-dev"
 start cmd /c npm i
 start cmd netsh http add urlacl url=http://*:7107/ user=Interactive listen=yes
